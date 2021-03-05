@@ -3,8 +3,6 @@
 % | Date :       April 22nd, 2020
 % +---------------------------------------------------------------+
 
-
-
 % +---------------------------------------------------------------+
 % | Page de garde
 % +---------------------------------------------------------------+
@@ -40,7 +38,7 @@
 	    \vspace{0.8cm}    
 	    {\large \bfseries Confidentiel}
 	  \else
-		\fi      
+	  \fi
 
   \end{center}
 		
@@ -50,16 +48,15 @@
     \begin{tabular}{l@{\hskip 10mm}l}
     	\textbf{Étudiant} & \textbf{\TBauthor} \\[0.1cm]
 	    \textbf{Enseignant responsable} & \TBsupervisor \\[0.1cm]
-		  \ifthenelse{\isempty{\TBindustryName}}%
-    		{}%empty
-		    {\textbf{Entreprise mandante} & 
-		      \begin{minipage}[t]{8cm}%
-		    		\TBindustryContact\\
-						\TBindustryName\\
-						\TBindustryAddress\\
-					\end{minipage} \\[0.1cm]
-				}%not empty
-	    \textbf{Année académique} & 2019-2020 \\[0.1cm]
+        \ifthenelse{\equal{\TBindustryName}{\empty}}
+        {}
+        {\textbf{Entreprise mandante} & 
+            \begin{minipage}[t]{8cm}
+                \TBindustryContact\\
+                \TBindustryName\\
+                \TBindustryAddress\\
+            \end{minipage} \\[0.1cm]}%
+        \textbf{Année académique} & \TBacademicYears \\[0.1cm]
     \end{tabular}
     
     \vspace{2.0cm}
