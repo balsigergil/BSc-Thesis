@@ -1,136 +1,82 @@
 \chapter{Journal de travail}
 
-\begin{landscape}
-
-\begin{longtable}[c]{lp{10cm}rrrr}
+\bgroup
+\def\arraystretch{1.5}
+\begin{longtable}[c]{l l l p{8.2cm}}
     \caption{Journal de travail}\\
 
     \hline
-    Date & Description & Rech. [h] & Dev. [h] & Rapport [h] & Admin [h] \\
+    \textbf{Semaine} & \textbf{Date} & \textbf{Temps [h]} & \textbf{Tâche}\\
+    \hline
     \hline
     \endfirsthead
     
     \hline
-    Date & Description & Rech. [h] & Dev. [h] & Rapport [h] & Admin [h] \\
+    \textbf{Semaine} & \textbf{Date} & \textbf{Temps [h]} & \textbf{Tâche}\\
+    \hline
     \hline
     \endhead
     
-    \multicolumn{6}{r}{\small \it Le journal de travail continue à la page suivante.} \\
+    \multicolumn{4}{r}{\small \it Le journal de travail continue à la page suivante.} \\
     \normalsize
     \endfoot
     
     \hline
     \endlastfoot
-
-
-  % Work
-	5.03.2020 
-	& Kick-off meeting avec le mandant \lipsum[1-1]
-	& 0 %recherche
-	& 0 %dev
-	& 0 %reporting
-	& 2\\ %admin
-
-	12.03.2020 
-	& Recherche sur l'état de l'art
-	& 4 %recherche
-	& 0 %dev
-	& 0 %reporting
-	& 0\\ %admin
-
-	19.03.2020 
-	& Mise en place de l'environnement de développement et documentation
-	& 0 %recherche
-	& 7 %dev
-	& 1 %reporting
-	& 0\\ %admin
-
-	25.03.2020 
-	& Rédaction de l'état de l'art
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	25.03.2020 
-	& Dev de la partie interface
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
 	
+	% Semaine 1
+	1
+	& 26.02.2021
+	& 0.5
+	& Meeting avec Alexandre Duc pour lancer le projet \\
 	
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
+	\hline
 	
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
+	% Semaine 2
+	\multirow{8}{*}{2}
+	& 01.03.2021
+	& 1
+	& Recherche sur les protocoles de consensus \\
 	
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
-
-	xx.xx.2020 
-	& Test
-	& 0 %recherche
-	& 0 %dev
-	& 4 %reporting
-	& 0\\ %admin
+	& 01.02.2021
+	& 1
+	& Recherche sur les protocoles de Zcash \\
+	
+	& 02.02.2021
+	& 2
+	& Lecture des specs de Diem \\
+	
+	& 02.02.2021
+	& 1
+	& Recherche de librairies Rust \\
+	
+	& 03.02.2021
+	& 2
+	& Création des dépôts sur GitHub et structure de la spécification en Markdown \\
+	
+	& 05.03.2021
+	& 0.5
+	& Meeting hebdomadaire avec Alexandre Duc \\
+	
+	& 05.03.2021
+	& 2
+	& Recherche sur le protocole Proof-of-Space \\
+	
+	& 05.03.2021
+	& 1
+	& Lecture du chap. 17 du Rust book \\
+	
+	\hline
+	
+	% Semaine 3
+	\multirow{1}{*}{3}
+	& 08.03.2021
+	& 2
+	& Rédaction du cahier des charges dans le rapport \\
+	
+	& 09.03.2021
+	& 2
+	& Rédaction du rapport et journal de travail \\
 	
 \end{longtable}
-
-
-\end{landscape}
+\egroup
