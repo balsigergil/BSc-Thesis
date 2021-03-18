@@ -14,8 +14,6 @@
 
 \newif\ifisdraft\isdraftfalse
 
-
-
 % +---------------------------------------------------------------+
 % | Paramètres
 % +---------------------------------------------------------------+
@@ -53,6 +51,8 @@ Dans ce travail... Ceci est le résumé publiable...
 \usepackage{template/TB-template}
 %\graphicspath{images/}
 
+\makeglossaries
+\input{chapters/glossary}
 
 \begin{document}
 
@@ -77,6 +77,9 @@ Dans ce travail... Ceci est le résumé publiable...
 % +---------------------------------------------------------------+
 \input{chapters/cdc}
 
+\glsaddall
+\setglossarystyle{listhypergroup} % list, altlist, listgroup, altlistgroup, listhypergroup, altlisthypergroup
+\printglossary
 
 % TOC
 % +---------------------------------------------------------------+
@@ -92,20 +95,18 @@ Dans ce travail... Ceci est le résumé publiable...
 
 \input{chapters/introduction}
 
-\input{chapters/etat-de-lart}
+\input{chapters/analyse}
 
-\input{chapters/ch_exemple}
+\input{chapters/conception}
 
-\input{chapters/architecture}
-
-\input{chapters/implementation}
+\input{chapters/realisation}
 
 \input{chapters/conclusion}
 
 % +---------------------------------------------------------------+
 \cleardoublepage
 \addcontentsline{toc}{chapter}{Bibliographie}
-\bibliographystyle{plain}
+\bibliographystyle{alpha}
 \bibliography{chapters/biblio}
 \nocite{*} %ajoute tout ce qu'il y a dans le bibtex
 
@@ -119,6 +120,5 @@ Dans ce travail... Ceci est le résumé publiable...
 \input{chapters/outils}
 
 \input{chapters/journal-de-travail}
-
 
 \end{document}
