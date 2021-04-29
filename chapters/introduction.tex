@@ -3,10 +3,32 @@
 
 \section{Problématique}
 
+Le Bitcoin est l'une des cryptomonnaies les plus connues et une des plus utilisées aujourd'hui en 2021. Cependant, elle n'est pas parfaite et certains points sur sa conception et son fonctionnement peuvent poser problème. Un des points les plus critique est la vérification des transactions qui est très consommatrice d'énergie. En effet, les mineurs de Bitcoin doivent allouer une grande quantité de puissance de calcule pour sécuriser la blockchain. A titre d'exemple, la puissance totale de tous les mineurs de Bitcoin regroupés permettrait d'alimenter un pays de taille comparable aux Pays-Bas \cite{BTC_cons}. 
+
+Un autre problème notable est confidentialité des transactions. Il faut savoir que les transactions effectuées sur la blockchain Bitcoin (et bien d'autres) sont consultables publiquement. Il est possible de voir le montant de chaque transaction et de parcourir la blockchain pour trouver le solde d'un compte. Et ceci très facilement grâce à explorateur de blockchain comme par exemple \url{blockchain.com}. Cela n'est ainsi pas adapter à des transactions sensibles comme des versements de salaire par exemple.
+
 \section{Objectifs}
+
+L'objectif principal de ce travail de Bachelor est le développement d'une cryptomonnaie et de sa blockchain pour palier à certains problèmes existants sur le Bitcoin actuellement. Le développement d'une cryptomonnaie étant potentiellement long et complexe, ce travail se limitera à une blockchain simplifiée mais fonctionnelle. L'objectif n'étant pas ne recréer une cryptomonnaie aussi compète que le Bitcoin mais de se concentrer sur les aspects techniques liés à l'écologie et à la confidentialité dans les blockchains.
+
+Le but est de comprendre pourquoi le Bitcoin consomme-t-il tant d'énergie et de trouver et développer une solution plus écologique. Une analyse approfondie des protocoles de consensus sera effectuée dans ce travail afin de savoir lequel serait le plus adapté pour répondre à la problématique. Il faudra ensuite implémenter un de ses protocoles en Rust et, à partir de cette implémentation, créer une blockchain.
+
+Résumé des objectifs :
+\begin{itemize}
+    \item Analyse des protocoles de consensus
+    \item Implémentation d'un protocole plus écologique que \gls{pow}.
+    \item Implémentation d'une blockchain utilisant le protocole réalisé
+\end{itemize}
 
 \section{Pourquoi ce projet ?}
 
+En plus de résoudre la problème décrite ci-dessus, ce travail à aussi pour but de permettre la compréhension du fonctionnement technique des cryptomonnaies à des personnes intéressées par ces technologies.
+
 \section{Organisation}
 
-Orga et dépôt GitHub...
+Ce travail à commencé le 26 février 2021.
+Selon le planning de la HEIG-VD, un rendu intermédiaire est planifié le 17 mai 2021. La date de rendu finale est le 30 juillet 2021.
+
+La gestion de projet, la planification et la gestion des heures est faite sur YouTrack, un outil de JetBrains.
+
+Le code source de ce travail est disponible sur GitHub au sein de l'organisation \href{https://github.com/spaceframeos}{Spaceframe}.
