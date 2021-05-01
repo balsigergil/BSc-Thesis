@@ -1,33 +1,95 @@
 \chapter{État de l'art}
 \label{ch:etat_art}
 
+\section{Qu'est-ce qu'un protocole de consensus ?}
+
+Dans une blockchain, un protocole de consensus est un algorithme permettant de mettre tous les noeuds du réseau d'accord sur une version de la blockchain, ceci en tenant compte du fait que certains noeuds peuvent être malveillants.
+
+Dans une structure centralisée, comme une banque par exemple, les transactions sont vérifiées par la banque elle-même donc il est difficile de forger de fausses transactions. Or, dans une structure décentralisée comme une blockchain, tout le monde peut se joindre au réseau et soumettre des blocs de transactions. Certains noeuds peuvent transmettre aux autres noeuds des blocs avec des transactions invalides et commettre des actes frauduleux comme de la double dépense.
+
+Il nous faut donc un algorithme permettant de synchroniser tous les noeuds avec une version identique de la blockchain afin de garantir l'authenticité de tous les blocs qu'elle contient et empêcher qu'une même entité contrôle toute la chaîne de blocs.
+
 \section{Protocoles de consensus}
 
-\subsection{Proof of work, delegated proof of work}
+\subsection{Proof of work}
+
+Proof of work est un des tout premier protocole de consensus créé et est aujourd'hui un des plus utilisé. Il a au début été développé afin se prémunir des spams d'e-mail. Il a, en 2009, été adapté pour les blockchains par Satoshi Nakamoto en créant le Bitcoin.
+
+Le protocole Proof of work utilise des ordinateurs appelés mineurs pour vérifier les blocs en résolvant des puzzles mathématiques. La résolution de ses puzzles requiert une grande puissance de calcule et une grande quantité d'énergie.
+
+Techniquement, les mineurs utilisent des fonctions de hachage cryptographiques. Une fois que le hash calculé rempli les conditions de la blockchain, par exemple que le hash commence par un certain nombre de 0, le mineur publie le bloc avec avec le hash trouvé aux autres noeuds de réseau. Si le réseau accepte le bloc, c'est-à-dire que la preuve de travail (le hash) est valide, alors le mineur en question reçoit une récompense pour son travail. Cela incite les mineurs à rester loyaux envers le réseau.
 
 \subsection{Proof of stake, delegated proof of stake}
 
+Le protocole de proof of stake est le deuxième protocole le plus utilisé dans les blockchains actuelles. Il fonctionne sur un principe différent que PoW car il ne requiert pas de puissance de calcul particulière ce qui en fait un bonne alternative en terme d'énergie.
+
+Proof of stake fonctionnement sur le principe de staking. C'est-à-dire d'allouer une certaine quantité de cryptomonnaie au réseau. Cette monnaie bloquée appartient toujours à l'entité mais ne peut plus être utilisée. Les nouveaux blocs seront créés par les entités qui mise le plus de jetons dans le réseau. Si ces personnes ne respectent pas leur engagement de contribuer au réseau de manière légitime, elle perdraient leur mise ce qui potentiellement ruinerait ces entités. 
+
+Avec cette architecture, pour pouvoir effectuer un acte de double dépense, il faudrait posséder et bloquer plus de la moitié de tous les jetons misés sur le réseau pour le contrôler ce qui rend ces attaques difficiles. Mais le fait que PoS ne requiert pas de puissance de calcule amène d'autres problèmes qui n'existaient pas avec PoW comme par exemple le problème du Nothing-to-stake.
+
+Un autre problème que l'on peut remarquer avec ce protocole est que ce sont toujours les entités qui mise le plus qui sont prioritaires pour ajouter des blocs à la blockchain ce qui pourrait rendre le protocole trop centralisé alors que l'on recherche plutôt l'inverse. 
+
+Pour palier à ce problème, on a créé le delegated proof of stake ou preuve d'enjeu déléguée en français. Le principe est qu'on utilise cette fois-ci un système de vote dans lequel chaque entité possède un nombre de voix proportionnel à la quantité de monnaie misée dans le réseau. Le système de vote varie en fonction des implémentations. Cela rend le protocole plus démocratique et ainsi ce ne sont pas toujours les mêmes entités qui ajoutent des blocs.
+
 \subsection{Proof of authority}
+
+Proof of authority est un algorithme proposé par un des cofondateur d'Ethereum, Gavin Wood. Ce protocole se base lui sur la réputation des entités qui valident les blocs. A la différence du proof of stake qui se sert de la monnaie, PoA met en valeur l'identité des validateurs qui sont sélectionnés comme entités de confiance.
+
+Il y a ainsi un nombre limité de validateurs ce qui rend le réseau plus évolutif et efficace qu'un système avec du proof of work ou proof of stake car le consensus peut être atteint plus rapidement.
+
+Proof of authority est un protocole qui se porte particulièrement bien au blockchains privées permettant aux entreprise d'utiliser pleinement la technologie de la blockchain avec une architecture centralisée. En effet, l'aspect décentralisé du PoS et PoW peut ne pas convenir à certaines sociétés. D'un autre côté, ce protocole ne s'adapte pas très bien au blockchain publique du fait de sa centralisation. Centralisation que les utilisateurs des blockchains cherchent à évité pour des raisons de confidentialité (politique) et de sécurité (pannes, attaques).
+
+On peut voir le PoA comme un renoncement à la décentralisation dans un but d'efficacité mais ce mécanisme n'est pas vu de la même manière par tous. Notamment critiqué à cause des risques de corruption possibles si les identités des validateurs sont connus. Un concurrent pourrait influencer les validateurs pour compromettre le réseau de l'intérieur.
+
+En conclusion, PoA est une bonne alternative au PoW et PoS pour les blockchains privées d'entreprise souhaitant utiliser ses technologies.
+
+Sources: \href{https://academy.binance.com/fr/articles/proof-of-authority-explained}{Binance}
 
 \subsection{Proof of space, proof of time-space}
 
-\subsection{Proof of capacity}
+Proof of space est un protocole ressemblant à proof of work à la différence qu'au lieu de réaliser des puzzles mathématiques, les mineurs appelé farmers vont réalisés des preuves cryptographiques en allouant de l'espace inutilisé sur leurs disques durs. Il est parfois également appelé proof of capacity. Ce principe permet de créer des preuves et valider les blocs rapidement avec un coût énergétique beaucoup plus faible que PoW. Ainsi on utilise la capacité de stockage comme ressource au lieu de la puissance de calcul
+
+Cependant, comme les vérifications peuvent être faites très rapidement comparé au Bitcoin où il faut trouver la solution au puzzle qui prend obligatoirement du temps, des nouvelle attaques apparaissent. Par exemple, un attaquant peut valider un grande quantité de blocs à la suite et les soumettre au réseau d'un seul coup. Chose qui n'est pas possible avec proof of work puisque qu'il faut nécessairement trouver la preuve de travail avant de vérifier le suivant. Or trouver la preuve de travail prend du temps, beaucoup plus qu'avec PoSpace. 
+
+Pour éviter ce problème il existe plusieurs solutions. La première est de pénaliser les farmers agissant de manière malicieuse en intégrant un type de transaction propre aux pénalités. Cette manière de faire à été décrite dans le document de Spacemint \cite{DBLP:conf/fc/ParkKFGAP18}. Une autre solution est d'utiliser des preuve de temps (proof of time) grâce à des fonctions à délai vérifiable (VDF). Cette solution à été choisie la le réseau Chia. Elle met en relation proof of space et proof of time pour donner un protocole de proof of space-time. C'est-à-dire que les farmers prouvent au réseau qu'ils ont stocké un certaine quantité de données pendant un certain temps.
+
+A noté que les données stockées sont inutiles dans le sens où elles ne représente rien de particulier. C'est donc le l'espace de stockage perdu au profit de la validation de blocs.
+
+\subsection{Proof of replication, catalytic space}
+
+Proof of replication est une adaptation de proof of space dans laquelle une majorité de l'espace de stockage peut être utilisé pour stocker des données utiles. Ici les farmers génèrent des preuves en prouvant qu'ils ont stocké des replicas de fichiers sur leurs disques. Ce principe est utilisé notamment dans la cryptomonnaie \href{https://filecoin.io/}{Filecoin}.
 
 \subsection{Proof of weight}
 
+...
+
 \subsection{Proof of importance}
+
+...
 
 \subsection{Proof of burn}
 
+...
+
 \subsection{Proof of personhood}
+
+...
 
 \subsection{Proof of activity}
 
+...
+
 \subsection{Practical Byzantine Fault Tolerance}
+
+...
 
 \subsection{Federated Byzantine Agreement}
 
+...
+
 \subsection{Delegated Byzantine Fault Tolerance}
+
+...
 
 \section{Analyse des protocoles}
 
