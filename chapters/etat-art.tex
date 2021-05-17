@@ -5,9 +5,11 @@
 
 Dans une blockchain, un protocole de consensus est un algorithme permettant de mettre tous les noeuds du réseau d'accord sur une version de la blockchain, ceci en tenant compte du fait que certains noeuds peuvent être malveillants.
 
-Dans une structure centralisée, comme une banque par exemple, les transactions sont vérifiées par la banque elle-même donc il est difficile de forger de fausses transactions. Or, dans une structure décentralisée comme une blockchain, tout le monde peut se joindre au réseau et soumettre des blocs de transactions. Certains noeuds peuvent transmettre aux autres noeuds des blocs avec des transactions invalides et commettre des actes frauduleux comme de la double dépense.
+Dans une structure centralisée, comme une banque par exemple, les transactions sont vérifiées par la banque elle-même donc il est difficile de forger de fausses transactions puisque ces dernières sont vérifiées pas une entité centrales. Or, dans une structure décentralisée comme une blockchain, tout le monde peut se joindre au réseau et soumettre des blocs de transactions. Certains noeuds peuvent transmettre aux autres noeuds des blocs avec des transactions invalides et commettre des actes frauduleux comme de la double dépense.
 
-Il nous faut donc un algorithme permettant de synchroniser tous les noeuds avec une version identique de la blockchain afin de garantir l'authenticité de tous les blocs qu'elle contient et empêcher qu'une même entité contrôle toute la chaîne de blocs.
+Il nous faut donc un algorithme permettant de synchroniser tous les noeuds avec une version identique de la blockchain afin de garantir l'authenticité de tous les blocs qu'elle contient et empêcher qu'une même entité contrôle toute la chaîne de blocs. Ainsi, un protocole de consensus va permettre de déterminer quel noeud va pouvoir effectuer les calcules nécessaires afin d'ajouter un nouveau bloc à la chaîne de blocs. Dans le but de motiver les noeuds à agir de manière honnête, le réseau les récompense lors de la création d'un nouveau bloc avec une certaine quantité de cryptomonnaie. 
+
+Tous les autres noeuds doivent alors se synchroniser et travailler sur la chaîne de blocs la plus longue. Le but étant que la chaîne de blocs honnête grandisse plus rapidement que d'autres chaînes créées par des utilisateurs malhonnêtes.
 
 \section{Protocoles de consensus}
 
@@ -17,11 +19,17 @@ Proof of work est un des tout premier protocole de consensus créé et est aujou
 
 Le protocole Proof of work utilise des ordinateurs appelés mineurs pour vérifier les blocs en résolvant des puzzles mathématiques. La résolution de ses puzzles requiert une grande puissance de calcule et une grande quantité d'énergie.
 
-Techniquement, les mineurs utilisent des fonctions de hachage cryptographiques. Une fois que le hash calculé rempli les conditions de la blockchain, par exemple que le hash commence par un certain nombre de 0, le mineur publie le bloc avec avec le hash trouvé aux autres noeuds de réseau. Si le réseau accepte le bloc, c'est-à-dire que la preuve de travail (le hash) est valide, alors le mineur en question reçoit une récompense pour son travail. Cela incite les mineurs à rester loyaux envers le réseau.
+Techniquement, les mineurs utilisent des fonctions de hachage cryptographiques. Pour simplifier, ces derniers doivent hacher l'ensemble des données du dernier bloc concaténé ($Bloc_n$) avec un nombre ($p$) qu'ils peuvent choisir. Ce nombre est appelé preuve de travail.
+
+\begin{equation*}
+    H = \textsf{SHA256}(Bloc_{n} \| p)
+\end{equation*}
+
+L'objectif est que le hash final ($H$) commence par un certain nombre de 0. Ce nombre est fixé par le réseau. Comme les fonctions de hachage ne permettant pas de retrouver les données fournies en entrée à partir de la sortie, il n'y a pas d'autre moyen que de tester toutes les entrées possible jusqu'à ce que le hash commence par le bon nombre de 0. Ainsi le mineur va modifier la preuve de travail $p$ jusqu'à ce que le hash $H$ remplisse les conditions de la blockchain. Le nombre de 0 demandé en sortie est en quelques sortes la difficulté de la preuve de travail car plus il y a de 0 à la suite, plus il faudra de temps au mineur pour trouver la preuve de travail correspondante. Ce nombre de 0 est automatiquement définit par le réseau et augmente avec le temps pour éviter que des mineurs malveillants arrivent à tenir le rythme.
 
 \subsection{Proof of stake, delegated proof of stake}
 
-Le protocole de proof of stake est le deuxième protocole le plus utilisé dans les blockchains actuelles. Il fonctionne sur un principe différent que PoW car il ne requiert pas de puissance de calcul particulière ce qui en fait un bonne alternative en terme d'énergie.
+Le protocole de proof of stake (ou preuve d'enjeu en français) est le deuxième protocole le plus utilisé dans les blockchains actuelles. Il fonctionne sur un principe différent que PoW car il ne requiert pas de puissance de calcul particulière ce qui en fait un bonne alternative en terme d'énergie.
 
 Proof of stake fonctionnement sur le principe de staking. C'est-à-dire d'allouer une certaine quantité de cryptomonnaie au réseau. Cette monnaie bloquée appartient toujours à l'entité mais ne peut plus être utilisée. Les nouveaux blocs seront créés par les entités qui mise le plus de jetons dans le réseau. Si ces personnes ne respectent pas leur engagement de contribuer au réseau de manière légitime, elle perdraient leur mise ce qui potentiellement ruinerait ces entités. 
 
@@ -31,7 +39,7 @@ Un autre problème que l'on peut remarquer avec ce protocole est que ce sont tou
 
 Pour palier à ce problème, on a créé le delegated proof of stake ou preuve d'enjeu déléguée en français. Le principe est qu'on utilise cette fois-ci un système de vote dans lequel chaque entité possède un nombre de voix proportionnel à la quantité de monnaie misée dans le réseau. Le système de vote varie en fonction des implémentations. Cela rend le protocole plus démocratique et ainsi ce ne sont pas toujours les mêmes entités qui ajoutent des blocs.
 
-\subsection{Proof of authority}
+\subsection{Proof of authority, proof of reputation}
 
 Proof of authority est un algorithme proposé par un des cofondateur d'Ethereum, Gavin Wood. Ce protocole se base lui sur la réputation des entités qui valident les blocs. A la différence du proof of stake qui se sert de la monnaie, PoA met en valeur l'identité des validateurs qui sont sélectionnés comme entités de confiance.
 
@@ -61,47 +69,91 @@ Proof of replication est une adaptation de proof of space dans laquelle une majo
 
 \subsection{Proof of weight}
 
-...
+Le mécanisme de consensus par proof of weight est un algorithme basé sur le modèle Algorand. Ce modèle basé sur un protocole de Byzantine agreement permet de vérifier rapidement les transactions et peut gérer beaucoup d'utilisateurs. 
+
+Les blockchains utilisant proof of weight assignent aux utilisateurs un poids relatif à une ressource qu'ils mettent à disposition de la blockchain. Proof of stake est en quelque sorte un protocole de type proof of weight dans lequel la quantité monnaie misée représente un poids. Plus ce poids est élevé, plus l'utilisateur à de chance de créer le prochain bloc.
+
+Mais proof of weight ne se limite pas à la quantité de monnaie misée sur le réseau comme proof of stake. Par exemple, avec Filecoin, le poids est défini par la quantité de données IPFS d'un utilisateur.
 
 \subsection{Proof of importance}
 
-...
+Proof of importance est un algorithme qui met l'accent sur les utilisateurs les plus importants sur le réseau, c'est-à-dire les utilisateurs qui effectuent le plus de transactions. Ainsi, plus un utilisateur aura fait de transactions, plus il aura de chance d'être sélectionné pour créer le prochain bloc. Cela a pour but de favoriser le transfert et le mouvement de la monnaie à travers le réseau. En opposition avec proof of stake qui favorise les utilisateurs à garder et bloquer leur argent.
+
+Proof of importance peut ainsi être utilisé en plus de proof of stake dans le but d'améliorer ce dernier. Cela résout une des principales critiques de PoS car PoS incite les utilisateurs à bloquer leur monnaie et se faisant centralise le système autour des personnes possédant le plus. PoI en plus de PoS permet d'éviter cette centralisation car les utilisateurs ne faisant pas de transaction seraient considéré comme moins important que les autres.
 
 \subsection{Proof of burn}
 
-...
+Proof of burn (preuve de destruction en français) est proposé comme une alternative à proof of work. C'est un protocole qui permet aux utilisateurs de brûler des coin afin de prouver leur dévouement envers la blockchain. Ainsi plus un utilisateur brûle de coins, plus il aura de chance d'être sélectionné pour créer le prochain bloc. Ce principe utilise du coup moins d'énergie puisqu'il n'y a pas besoin de grande de puissance de calcul.
 
-\subsection{Proof of personhood}
+Le fonctionnement est le suivant: les utilisateurs souhaitant sécuriser le réseau vont envoyer des coins à une adresse d'incinération. Cette adresse rend les coins inutilisables ce qui crée une pénurie plus ou moins constante de liquidité augmentant sa valeur potentielle. C'est un moyen alternatif d'investir dans la sécurité du réseau.
 
-...
+Il y a plusieurs moyen de mettre en oeuvre le protocole. On peut sécuriser la blockchain en brûlant des Bitcoin ou bien certaines cryptomonnaie arrivent à le faire en brûlant leur propre monnaie.
 
-\subsection{Proof of activity}
+En comparaison avec le proof of stake, les coins sont ici brûlé et donc inutilisable après alors qu'avec la preuve d'enjeu, l'utilisateur souhaitant se retirer peut débloquer son argent et l'utiliser à nouveau. Cela ne crée ainsi pas de pénurie permanente.
 
-...
+Le proof of burn a des avantages comme son aspect écologique ou encore le fait que les mineurs n'aient pas besoin de matériel particulier. Cependant il aussi des inconvénients comme le fait qu'il n'a jamais été mis en place à grande échelle. Le fait aussi de brûler des Bitcoin qui on été forgés avec du PoW rend le protocole tout de suite moins écologique.
 
-\subsection{Practical Byzantine Fault Tolerance}
+\subsection{Proof of history}
 
-...
+Proof of history \cite{proof:poh} est un protocole permettant de résoudre les problèmes de consensus au sein d'un système distribué grâce à des fonctions de délai vérifiables (VDF). Un des plus gros problème avec les blockchains est la synchronisation des événements et s'assurer qu'un événement B à bien eu lieu après un événement A et qu'il est impossible d'en modifier l'ordre. Proof of history permet cela grâce à une fonction de délai vérifiable. C'est une fonction qui permet de prouver qu'un certain temps réel s'est bien écoulé et est facilement et efficacement vérifiable par d'autres utilisateurs.
 
-\subsection{Federated Byzantine Agreement}
+Le protocole est ainsi une VDF avec un compteur qui s'appelle en boucle en utilisant des fonctions de hachage cryptographique comme illustré dans le schéma ci-dessous.
 
-...
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=8cm]{images/solana}
+    \caption{Schéma simplifié de proof of history}
+\end{figure}
 
-\subsection{Delegated Byzantine Fault Tolerance}
+On peut y injecter des entrées à un instant t. Cela va changer de manière imprédictible les données futures et ainsi ancrer les données dans l'histoire de la blockchain.
 
-...
+Ce mécanisme a été inventé par Anatoly Yakovenko et est utilisé par la blockchain Solana. Ce protocole permet d'obtenir une bande passante de transactions très élevée, jusqu'à 50'000 transactions par seconde d'après les créateurs.
+
+\subsection{Byzantine Fault Tolerance}
+
+Byzantine Fault Tolerance est un large groupe de protocoles permettant d'atteindre un consensus entre les noeuds du réseau en prenant en compte le fait que des noeuds peuvent être indisponibles, transmettre des information erronées ou être malhonnêtes. Il existe différents types d'algorithme basés sur BFT mais la plus part d'entre eux ont un fonctionnement similaire. 
+
+Avec les protocoles BFT, pour simplifier, un noeud est choisi pour créer le prochain bloc. Cela peut se faire grâce à un système de vote ou aléatoirement sans tenir compte d'une ressource en particulier. Le bloc est ensuite transmis à travers le réseau à plusieurs autres noeuds. Ceux autres noeuds vont faire certaines vérifications et transmettre le bloc à leur tour et le consensus est atteint lorsque la majorité des noeuds on reçu le bloc et sont d'accord sur la version de la chaîne de bloc. Ensuite un autre noeud est sélectionné pour le bloc suivant.
+
+Il est facile simple de détecter les fraudes car si les blocs sont invalides ils seront supprimés par les autres noeuds. Cependant les protocoles BFT sont pour la plupart vulnérables aux attaques de Sybil donc si une majorité des noeuds du réseau sont malhonnêtes, il sera impossible d'obtenir un consensus correct. C'est pour cela qu'ils sont souvent associer à d'autres protocoles comme PoW ou proof of stake.
 
 \section{Analyse des protocoles}
+
+Tous ces protocoles permettent d'une manière ou d'une autre de sécuriser la blockchain. Cependant ils ne respectent pas tous les contraintes écologiques de ce travail. Afin de pouvoir faire un choix, ces protocole seront ci-dessous analysés afin de pouvoir trouver les mieux adaptés selon différents critères comme l'impact écologique, la facilité d'implémentation, les ressources disponibles et autre points importants.
+
+\begin{itemize}
+    \item \textbf{Proof of work}: ce protocole est certes le plus populaire et possède donc le plus de ressources sur internet, il est cependant le moins écologique de tous. C'est principalement pour cette raison qu'il ne sera pas question d'implémenter un protocole comme PoW ou autre protocole basé sur ce dernier. A noté que l'implémentation d'un algorithme de proof of work est plus simple que la majeur partie des autres protocoles.
+    \item \textbf{Proof of stake}: écologiquement plus intéressant que PoW, la preuve d'enjeu peut se trouver un bonne alternative en terme de consommation d'énergie. Cependant, comme elle fonctionne sur le principe de bloquer de l'argent pour la sécurité du réseau, cela implique qu'il faut nécessairement un certaine quantité d'argent dès le début, ce qui est problématique pour commencer une blockchain à partir de rien. Ethereum qui effectue une migration de PoW vers PoS possède déjà beaucoup d'argent en circulation pouvant être bloqué pour faire de la preuve d'enjeu convenablement. Mais à partir de rien, c'est conceptuellement difficile ce qui rend l'implémentation plus compliquée.
+    \item \textbf{Proof of authority}: PoA est une bonne alternative pour les blockchains privées. Son implémentation est plutôt simple car il n'y a pas besoin d'utiliser des ressources particulières comme de la puissance de calcul (PoW), une somme d'argent (PoS) ou de l'espace de stockage (PoSpace). Il suffit de simplement vérifier les noeud validateurs qui sont explicitement autorisé par une entité. Il est du coup difficile pour n'importe qui de devenir validateur et contribuer à la sécurité du réseau. C'est pourquoi elle est adaptée à des blockchain privée or, dans ce travail, on souhaite implémenter une cryptomonnaie publique où tout le monde peut contribuer.
+    \item \textbf{Proof of space}: ce protocole est intéressant du point de vue énergétique car il fonctionne comme PoW mais ne demande pas de puissance de calcule mais de l'espace de stockage à la place. Son empreinte écologique est du coup beaucoup plus faible. Son implémentation est cependant plus complexe car il faut utiliser les graphs permettant de prouver qu'un utilisateur à bien stocker tant de donnée et ces dernier ne sont pas forcément facile à réalisé. Mais il existe des implémentation de Proof of space comme Chia ou encore Spacemesh ce qui donne déjà un quantité de ressource acceptable. Ce protocole est ainsi un très bon candidat pour ce travail car bien adapté.
+    \item \textbf{Proof of replication}: ce protocole possède les mêmes avantages que proof of space vue juste au dessus mais avec en plus l'avantage que les données stockées sont des données utiles. Mais en revanche l'implémentation est beaucoup trop compliquée et sort du cadre de ce travail. Il y a des ressources comme Filecoin qui sont disponibles et peuvent aider à comprendre le fonctionnement.
+    \item \textbf{Proof of weight}: étant une famille de protocole, il n'existe pas un protocole mais plusieurs avec par exemple proof of stake qui peut être associé à du proof of weight d'une certaine manière. En tant que tel, proof of weight est assez jeune et très peu utilisé avec peu d'information disponible sur internet, c'est pourquoi il sera mis de côté mais reste un protocole intéressant sachant qu'on peut dériver du PoSpace en PoWeight en assignant un poids relatif à l'espace de stockage.
+    \item \textbf{Proof of importance}: le principe de ce protocole est également intéressant mais est, à nouveau, très jeune avec peu de ressources disponibles.
+    \item \textbf{Proof of burn}: Proof of burn a un concept assez spécial et peut être un protocole écologique si les coins brûlé sont les coins de la cryptomonnaie même. Cependant ce protocole n'a jamais été testé à large échelle et se trouve être assez théorique avec très peu d'implémentations existantes et de ressources disponibles le rendant peu attractif.
+    \item \textbf{Proof of history}: probablement le protocole le plus intéressant avec proof of space car c'est également un protocole écologique. Son concept est innovant et utilisé dans la blockchain Solana donc déjà plus ou moins déployé. Cependant les concepts utilisés sont plus obscures que ceux utilisé avec Proof of space ce qui rend son implémentation plus compliquée car plus difficile à comprendre. Il y a quelques ressources disponible sur la documentation de Solana mais moins que sur le réseau Chia par exemple.
+    \item \textbf{Byzantine Fault Tolerance}: cette famille de protocole englobe tous les algorithmes de consensus vu ci-dessus, ce n'est pas un protocole à proprement dit. On utilise un ou plusieurs protocoles vu précédemment pour avoir de la \textit{Byzantine Fault Tolerance} au sein d'un réseau d'ordinateurs distribués. Cela pour éviter principalement les attaques de Sybil.
+\end{itemize}
+
+\subsection{Proof of space vs. proof of history}
+
+Les deux protocoles les plus intéressants écologiquement sont les algorithmes type proof of space et ceux de type proof of history. Pour ce travail, c'est un protocole de type proof of space qui sera implémenté car son concept est plus compréhensible que celui utilisé par Solana. Étant donné que l'implémentation doit pouvoir de faire dans le cadre d'un travail de Bachelor, les algorithmes utilisé par le réseau Chia sont particulièrement adapté car bien documentés. Le réseau Chia a été conçu en partie par le créateur de BitTorrent rendant le projet assez crédible bien que Solana soit aussi un projet décent. La technologie proof of space a également été bien étudié par des cryptographes depuis 2015 \cite{DBLP:conf/crypto/DziembowskiFKP15}, \cite{DBLP:conf/asiacrypt/AbusalahACKPR17}. Les créateurs ont publié un document décrivant plus techniquement le fonctionnement de leur blockchain \cite{chia:greenpaper}, ce qui offre une solide ressource pour ce travail.
 
 \section{Attaques possibles sur les blockchains}
 
 \subsection{Attaque Sybil}
+...
 \subsection{Attaque des 51\%}
+...
 \subsection{Grinding attacks}
+...
 \subsection{Reécriture de l'historique}
+...
 \subsection{Problème du "Nothing-to-stake"}
+...
 
 \section{Mécanismes de sécurisation}
 
 \subsection{Zcash}
+...
 \subsection{Monero}
+...
