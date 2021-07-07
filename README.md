@@ -1,9 +1,9 @@
 <h1 align="center">
     <img src="https://avatars.githubusercontent.com/u/80397804?s=100&v=4">
-    <p>Bachelor thesis</p>
+    <p>Bachelor of Science Thesis</p>
 </h1>
 <h3 align="center">Spaceframe - Building an ecological and confidential cryptocurrency</h3>
-<p align="center">By Gil Balsiger in 2021 at HEIG-VD in Switzerland</p>
+<p align="center">By Gil Balsiger in 2021 at HEIG-VD in :switzerland:Switzerland</p>
 
 ---
 
