@@ -3,10 +3,10 @@
     <p>Bachelor thesis</p>
 </h1>
 <h3 align="center">Spaceframe - Building an ecological and confidential cryptocurrency</h3>
-<p align="center"><strong>Author</strong>: Gil Balsiger<br><strong>Year</strong>: 2021</p>
+<p align="center">By Gil Balsiger in 2021 at HEIG-VD in Switzerland</p>
 
 ---
 
-The latest PDF version of the report is available in french [here](build/tb_report.pdf).
+The latest PDF version of the report is available in french [here](https://raw.githubusercontent.com/balsigergil/TB-rapport/main/build/tb_report.pdf).
 
 The source code is available on [GitHub](https://github.com/spaceframeos/spaceframe).
