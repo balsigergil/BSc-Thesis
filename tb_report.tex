@@ -34,9 +34,9 @@
 \newcommand{\TBindustryName}{}
 \newcommand{\TBindustryAddress}{}
 
-% Confidentiel?
-% uncomment if confidential / comment if not confiential
-% \isconfidentialtrue
+
+
+% TODO Résumé publiable
 
 \newcommand{\TBresumePubliable}{
 Dans ce travail... Ceci est le résumé publiable...
@@ -54,6 +54,8 @@ Dans ce travail... Ceci est le résumé publiable...
 
 \makeglossaries
 \input{chapters/glossary}
+
+\addbibresource{chapters/biblio.bib}
 
 \begin{document}
 
@@ -108,9 +110,7 @@ Dans ce travail... Ceci est le résumé publiable...
 % +---------------------------------------------------------------+
 \cleardoublepage
 \addcontentsline{toc}{chapter}{Bibliographie}
-\bibliographystyle{alpha}
-\bibliography{chapters/biblio}
-\nocite{*} %ajoute tout ce qu'il y a dans le bibtex
+\printbibliography
 
 \listoffigures
 \listoftables

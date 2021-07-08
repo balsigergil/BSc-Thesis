@@ -8,17 +8,19 @@
 
 \subsection*{Contexte}
 
-Le Bitcoin est l'une des cryptomonnaies les plus connues et une des plus utilisées aujourd'hui en 2021. Cependant, elle n'est pas parfaite et certains points sur son fonctionnement posent problème. Un des points importants est la vérification des transactions qui est très consommatrice d'énergie. A titre d'exemple, la puissance totale de tous les mineurs de Bitcoin regroupés permettrait d'alimenter un pays de taille comparable aux Pays-Bas \cite{BTC_cons}. Un autre problème notable est que les transactions sont consultables publiquement ce qui pose un problème de confidentialité. Il est possible de voir le montant de chaque transaction et ainsi parcourir la blockchain pour trouver le solde d'un compte. Cela n'est pas adapter à des transactions plus sensibles comme des versements de salaire par exemple.
+Le Bitcoin est l'une des cryptomonnaies les plus connues et une des plus utilisées aujourd'hui en 2021. Cependant, elle n'est pas parfaite et certains points sur son fonctionnement posent problème. Un des points importants est la vérification des transactions, basée sur algorithme de preuves de travail (Proof of Work), est très consommatrice d'énergie. A titre d'exemple, la puissance totale de tous les mineurs de Bitcoin regroupés ensemble permettrait d'alimenter un pays de taille comparable aux Pays-Bas \cite{BTC_cons}. Un autre problème est que les transactions sont consultables publiquement ce qui pose un problème de confidentialité. Il est possible de voir le montant de chaque transaction et ainsi parcourir la blockchain pour trouver le solde d'un compte. Cela n'est pas adapter à des transactions plus sensibles comme des versements de salaire par exemple. De plus, les performances du Bitcoin en terme de transactions par secondes sont très faibles comparé, par exemple, au réseau Visa. Le réseau Bitcoin permet 4 à 7 transactions par secondes contre plus de 2'000 pour Visa.
 
 \subsection*{Solutions existantes}
 
-Il existe une multitude de blockchains et cryptomonnaies. Cependant la majorité d'entre elles utilisent le même principe énergivore que Bitcoin ou sont des tokens sur la blockchain Ethereum qui n'est, en 2021, ni plus écologique ni plus confidentielle que Bitcoin.
+Il existe une multitude de blockchains et cryptomonnaies. Cependant, beaucoup d'entre elles utilisent le même principe énergivore que Bitcoin ou sont des tokens sur la blockchain Ethereum qui n'est, en 2021, ni plus écologique ni plus confidentielle que Bitcoin (Ethereum est cependant en train d'effectuer une migration vers un algorithme de preuve d'enjeu).
 
-Mais il y a tout de même des solutions existantes. Il existe des algorithmes beaucoup moins consommateur d'énergie que la vérification par preuve de travail (Proof-of-Work) utilisée par Bitcoin comme Proof-of-Stake ou encore Proof-of-Space. Concernant les problèmes de confidentialités, il existes des blockchains confidentielles comme Monero ou Zcash. Cependant, il n'y a pas blockchain qui utilise un algorithme écologique et confidentielle à la fois.
+Mais il y a tout de même des solutions existantes. Il existe des algorithmes beaucoup moins consommateur d'énergie que la vérification par preuve de travail (Proof of Work) utilisée par Bitcoin comme la preuve d'enjeu (Proof of Stake) ou encore la preuve d'espace (Proof of Space). Concernant les problèmes de confidentialités, il existes des blockchains confidentielles comme Monero ou Zcash. Cependant, il n'y a pas blockchain qui utilise un algorithme écologique et confidentiel à la fois.
 
 \subsection*{Objectif principal}
 
-L'objectif principal dans le but de résoudre cette problématique est de développer une blockchain qui utilisera un protocole de consensus écologique pour vérifier les transactions comme du Proof-of-Stake ou du Proof-of-Space. Pour les raisons de confidentialité précédemment évoquées, les transactions seront chiffrées au sein de la blockchain pour pas que leurs montants ou les adresses ne soient consultables publiquement.
+L'objectif principal dans le but de résoudre cette problématique est d'analyser les protocoles existant afin de trouver un protocole plus écologique que la preuve de travail et de développer une blockchain qui utilisera ce protocole de consensus pour vérifier les transactions. Le but est également de comprendre le fonctionnement des cryptomonnaies au travers du développement de l'une d'entre elles.
+
+%Pour les questions de confidentialité précédemment évoquées, les transactions seront chiffrées au sein de la blockchain pour pas que leurs montants ou les adresses ne soient consultables publiquement.
 
 \section*{Cahier des charges}
 
@@ -33,9 +35,9 @@ L'objectif principal dans le but de résoudre cette problématique est de dével
 
 \textbf{Travail pratique}
 
-L'objectif de ce travail pratique est l'implémentation d'une cryptomonnaie en Rust.
+L'objectif de ce travail pratique est l'implémentation d'une cryptomonnaie.
 Dans un premier temps, l'objectif est d'implémenter un algorithme de consensus par Proof of Space (ou Proof of Space-time) et de réaliser une blockchain utilisant cet algorithme.
-Dans un second temps, il sera question d'y intégrer un mécanisme de sécurisation de la blockchain au moyen preuves à divulgation nulle de connaissance afin de rendre les transaction confidentielles.
+Dans un second temps, il sera question d'y intégrer un mécanisme de sécurisation de la blockchain au moyen preuves à divulgation nulle de connaissance (zero-knowledge proofs) afin de rendre les transactions confidentielles.
 
 \subsection*{Si le temps le permet}
 
