@@ -7,6 +7,6 @@
 
 ---
 
-The latest PDF version of the report is available in french [here](https://raw.githubusercontent.com/balsigergil/TB-rapport/main/tb_report.pdf).
+The latest PDF version of the report is available in french [here](https://raw.githubusercontent.com/balsigergil/BSc-Thesis/main/tb_report.pdf).
 
 The source code is available on [GitHub](https://github.com/spaceframeos/spaceframe).
