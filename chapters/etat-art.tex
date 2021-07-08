@@ -15,7 +15,10 @@ Il nous faut donc un algorithme permettant de synchroniser tous les noeuds sur u
 
 Tous les autres noeuds doivent alors se synchroniser et travailler sur la chaîne de blocs la plus longue s'il y a plusieurs branches disponibles. Le but étant que la chaîne de blocs honnête grandisse plus rapidement que d'autres chaînes isolées ou frauduleuses.
 
+
 \section{Protocoles de consensus}
+
+\textit{TODO: Petite intro de section}
 
 \subsection{Proof of work}
 \label{consensus:pow}
@@ -30,7 +33,9 @@ Techniquement, les mineurs utilisent des fonctions de hachage cryptographiques. 
     H = \textsf{SHA256}(\textsf{Bloc}_n \| p)
 \end{equation*}
 
-L'objectif est que le hash final $H$ commence par un certain nombre de 0. Ce nombre est fixé par le réseau. Comme les fonctions de hachage ne permettant pas de retrouver les données fournies en entrée à partir de la sortie, il n'y a pas d'autre moyen que de tester toutes les entrées possible jusqu'à ce que le hash commence par le bon nombre de 0. Ainsi le mineur va modifier la preuve de travail $p$ jusqu'à ce que le hash $H$ remplisse les conditions de la blockchain. Le nombre de 0 demandé en sortie est en quelques sortes la \textbf{difficulté} de la preuve de travail car plus il y a de 0 à la suite, plus il faudra de temps au mineur pour trouver la preuve de travail correspondante. Ce nombre de 0 est automatiquement définit par le réseau et augmente avec le temps.
+L'objectif est que le hash final $H$ commence par un certain nombre de 0. Ce nombre est fixé par le réseau. Comme les fonctions de hachage ne permettant pas de retrouver les données fournies en entrée à partir de la sortie, il n'y a pas d'autre moyen que de tester toutes les entrées possible jusqu'à ce que le hash commence par le bon nombre de 0. Ainsi le mineur va modifier la preuve de travail $p$ jusqu'à ce que le hash $H$ remplisse les conditions de la blockchain. 
+
+Le nombre de 0 demandé en sortie est ce que l'on appelle la \textbf{difficulté} de la preuve de travail car plus il y a de 0 à la suite, plus il faudra de temps au mineur pour trouver la preuve de travail correspondante. Ce nombre de 0 est automatiquement définit par le réseau et est adapté à la puissance de calcul globale. C'est-à-dire que si la puissance augmente parce que de nouveaux mineurs ont rejoint le réseau, alors la difficulté augmentera également. Ceci afin de maintenir le temps de création d'un bloc à environ 10 minutes. Si des mineurs viendraient à quitter le réseau, il y aurait moins de puissance de calcul disponible, la difficulté sera alors revue à la baisse.
 
 \subsection{Proof of stake, delegated proof of stake}
 \label{consensus:pos}
@@ -100,20 +105,23 @@ Le \textit{proof of burn} a des avantages comme son aspect écologique ou encore
 
 \subsection{Proof of history}
 
-\textit{Proof of history} \cite{proof:poh} est un protocole permettant de résoudre les problèmes de consensus au sein d'un système distribué grâce à des \textbf{fonctions de délai vérifiables (VDF)}. Un des plus gros problème avec les blockchains est la synchronisation des événements et s'assurer qu'un événement B à bien eu lieu après un événement A et qu'il est impossible d'en modifier l'ordre. \textit{Proof of history} permet cela grâce à une fonction de délai vérifiable. C'est une fonction qui permet de prouver qu'un certain temps réel s'est bien écoulé et est facilement et efficacement vérifiable par d'autres utilisateurs.
+\textit{Proof of history} \cite{proof:poh} est un protocole permettant de résoudre les problèmes de synchronisation au sein d'un système distribué grâce à des \textbf{fonctions à délai vérifiables (VDF)}. Ce n'est \textbf{pas} un protocole de consensus à lui seul cependant il est très intéressant et novateur c'est pourquoi il est inclu dans ce chapitre. Un des plus gros problème avec les blockchains et les systèmes décentralisés est la synchronisation des événements. S'assurer qu'un événement $B$ à bien eu lieu après un événement $A$ et avant un événement $C$ et qu'il est impossible d'en modifier l'ordre après coup. \textit{Proof of history} permet d'accomplir cela grâce à une fonction de délai vérifiable sous forme de fonction de hachage itérative. C'est une fonction qui permet de prouver qu'un certain temps réel s'est bien écoulé et est facilement vérifiable par d'autres utilisateurs.
 
-Le protocole est ainsi une VDF avec un compteur qui s'appelle en boucle en utilisant des fonctions de hachage cryptographique comme illustré dans le schéma ci-dessous.
+Le protocole est ainsi une fonction de hachage qui s'appelle en boucle comme illustré dans le schéma ci-dessous.
 
-\begin{figure}[h!]
+\begin{figure}[H]
     \centering
     \includegraphics[width=8cm]{images/solana}
     \caption{Schéma simplifié de proof of history}
 \end{figure}
 
-On peut y injecter des entrées à un instant t. Cela va changer de manière imprédictible les données futures et ainsi ancrer les données dans l'histoire de la blockchain.
+On peut y injecter des entrées à tout moment. Cela va changer de manière imprédictible les données futures et ainsi ancrer les données dans l'historique de la chaîne de hachage.
 
-Ce mécanisme a été inventé par Anatoly Yakovenko et est utilisé par la blockchain Solana. Ce protocole permet d'obtenir une bande passante de transactions très élevée, jusqu'à 50'000 transactions par seconde d'après les créateurs rendant le protocole plus performant que Bitcoin.
+Ce mécanisme a été inventé par Anatoly Yakovenko et est utilisé par la blockchain Solana. Ce protocole est utilisé avant un algorithme de consensus de type \emph{Delegated Byzantine Fault Tolerance}. L'auteur appelle le \emph{Proof of History}: \textbf{Clock before consensus}. C'est-à-dire que le \emph{PoH} ce charges de remettre dans l'ordre les événements avant faire le consensus.
 
+Ce protocole permet d'obtenir une bande passante de transactions très élevée, jusqu'à 50'000 transactions par seconde d'après les créateurs rendant le protocole plus performant que Bitcoin qui atteint lui une douzaine de transactions par secondes.
+
+% TODO: Réécrire Byzantine Fault Tolerance
 \subsection{Byzantine Fault Tolerance}
 
 \textit{Byzantine Fault Tolerance} est un large groupe de protocoles permettant d'atteindre un consensus entre les noeuds du réseau en prenant en compte le fait que des noeuds peuvent être indisponibles, transmettre des informations erronées ou être malhonnêtes. Il existe différents types d'algorithme basés sur \textit{BFT} mais la plus part d'entre eux ont un fonctionnement similaire. 
@@ -139,11 +147,8 @@ Tous ces protocoles permettent d'une manière ou d'une autre de sécuriser la bl
     \item \textbf{Byzantine Fault Tolerance}: cette famille de protocole englobe tous les algorithmes de consensus vu ci-dessus, ce n'est pas un protocole à proprement dit. On utilise un ou plusieurs protocoles vu précédemment pour avoir de la \textit{Byzantine Fault Tolerance} au sein d'un réseau d'ordinateurs distribués. Cela pour éviter principalement les attaques de Sybil.
 \end{itemize}
 
-\subsection{Proof of space vs. proof of history}
-
-Les deux protocoles les plus intéressants écologiquement sont les algorithmes type \textit{proof of space} et ceux de type \textit{proof of history}. Pour ce travail, c'est un protocole de type proof of space qui sera implémenté car son concept est plus compréhensible que celui utilisé par Solana. Étant donné que l'implémentation doit pouvoir de faire dans le cadre d'un travail de Bachelor, les algorithmes utilisé par le réseau Chia sont plutôt bien adapté car bien documentés. Le réseau Chia a été conçu en partie par le créateur de BitTorrent rendant le projet assez crédible bien que Solana soit aussi un projet décent. La technologie \textit{proof of space} a également été bien étudié par des cryptographes depuis 2015 \cite{DBLP:conf/crypto/DziembowskiFKP15}, \cite{DBLP:conf/asiacrypt/AbusalahACKPR17}. Les créateurs ont publié un document décrivant plus techniquement le fonctionnement de leur blockchain \cite{chia:greenpaper}, ce qui offre une solide ressource pour ce travail.
-
-\section{Attaques possibles sur les blockchains}
+% TODO: Attaque sur les blockchains
+\section{Attaques sur les blockchains}
 
 \subsection{Attaque Sybil}
 ...
@@ -158,9 +163,42 @@ Les deux protocoles les plus intéressants écologiquement sont les algorithmes 
 
 \section{Mécanismes de sécurisation}
 
+La technologie de la blockchain apporté par Bitcoin est révolutionnaire. Pouvoir faire des paiements sans passer par un organisme centrale est génial mais le problème pour réaliser cela est qu'il faut conserver publiquement un registre de toutes les transactions. Les entrées et sorties des transactions sont identifiées par des adresses dérivées des clés publiques des utilisateurs. Les transactions sont ainsi pseudonymes. Satoshi Nakamoto l'a dit dans son whitepaper: \textit{The public can see that someone is sending an amount to someone else, but without information linking the transaction to anyone.}
+
+Mais les transaction ne sont pas anonymes. On peut quand même voir le montant, de qui et vers qui va l'argent même si on ne sais pas forcément qui sont derrières les adresses. Il faut bien faire la distinction entre \emph{anonyme} et \emph{pseudonyme}.
+
+Cependant, il existe des blockchains qui permettent d'anonymiser leurs transactions. Rendant illisible le montant et les adresses ainsi que tout autres données. Les deux cryptomonnaies les plus connue à ce sujet sont présentées ci-dessous. 
+
 \subsection{Zcash}
 ...
 \subsection{Monero}
 ...
+
+\section{Cryptomonnaies de 3ème génération}
+
+On peut qualifier le Bitcoin de 1ère génération de cryptomonnaie. Il y a eu ensuite Ethereum et l'apparition des smart-contracts considéré comme cryptomonnaie de 2ème génération. Et maintenant il y a les cryptomonnaies de 3ème génération qui tentent de résoudre les problèmes présents avec le Bicoin et Ethereum. Notamment les soucis de performance et de stockage.
+
+\subsection{Performance des blockchains}
+
+Un point important est la performance des blockchains. Or le Bitcoin ne peut traiter que 4 à 5 transactions par seconde ce qui le rend très peu performant comparé au réseau VISA qui traite environ 2000 transactions par seconde en moyenne et peu monter plus haut en cas de forte affluence. Le problème vient du fait qu'il faut 10 minutes pour générer un bloc et que chaque bloc fait au maximum 1 mégaoctet. Ces informations sont codées en dur dans le code source de Bitcoin ce qui veut dire qu'il est possible de les modifier pour améliorer les performances du réseau Bitcoin. Mais alors pourquoi les développeurs ne l'ont pas fait ? 
+
+Il y a deux possibilités: 1. réduire le temps de génération d'un bloc et 2. augmenter la taille maximum d'un bloc. 
+
+La première possibilité est compliquée à mettre en place car la propagation d'un nouveau bloc à travers le réseau prend du temps. Réduire le temps de création implique de réduire la difficulté de la preuve de travail ce qui fera que plus de mineurs généreront plus de blocs rendant le consensus plus compliqué à cause du nombre de mineurs présent sur le réseau et d'un propagation lente.
+
+La deuxième possibilité à fait de grands débats au sein de la communauté. C'est facile d'augmenter la taille des blocs mais cela implique que la blockchain prendra plus d'espace de stockage à l'avenir. Certains développeurs étaient pour une augmentation et d'autres non ce qui est venu à créer \emph{Bitcoin Cash}, un "hard fork" de Bitcoin. Les développeurs de Bitcoin Cash ont décidé d'augmenter la taille maximum des blocs. Ils ont choisi un bloc dans la blockchain Bitcoin et ont créé une nouvelles branches à partir depuis laquelle les nouveaux blocs de Bitcoin Cash seront créés. Par ailleurs, si vous aviez des Bitcoins avant la séparation vous avez du coup le même montant en Bitcoin Cash (BCH) mais aussi en Bitcoin. Comme les deux branches sont séparées l'une de l'autre, c'est comme si les coins s'étaient dupliqués.
+
+\subsection{Cardano}
+
+% TODO: Écrire Cardano
+
+\subsection{IOTA}
+
+% TODO: Écrire IOTA
+
+\subsection{Solana}
+
+% TODO: Écrire Solana
+
 
 \end{document}

@@ -78,14 +78,13 @@ Dans ce travail... Ceci est le résumé publiable...
 % +---------------------------------------------------------------+
 \subfile{chapters/cdc}
 
-\glsaddall
-\setglossarystyle{listhypergroup} % list, altlist, listgroup, altlistgroup, listhypergroup, altlisthypergroup
-\printglossary
-
 % TOC
 % +---------------------------------------------------------------+
 \tableofcontents
-\clearpage
+
+\glsaddall % TODO: remove this line
+\setglossarystyle{listhypergroup}
+\printglossary
 
 
 % Content
@@ -100,7 +99,7 @@ Dans ce travail... Ceci est le résumé publiable...
 
 \subfile{chapters/etat-art}
 
-\subfile{chapters/conception}
+\subfile{chapters/pospace}
 
 \subfile{chapters/realisation}
 
