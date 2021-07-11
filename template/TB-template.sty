@@ -8,67 +8,60 @@
 % +---------------------------------------------------------------+
 
 \newcommand{\TBmaketitle}{
-	\thispagestyle{empty}
 
-	\begin{minipage}[t]{6cm}
-		\vspace{0pt}%usefull to align top
-		\includegraphics[width=3cm]{template/logo_heig-vd-2020.png}
-	\end{minipage}\hfill
-	\begin{minipage}[t]{10cm}%
-		\vspace{0pt}%usefull to align top
-		\small%
-		\begin{flushright}%
-			\TBdpt\\
-			\TBfiliere\\
-			\TBorient
-		\end{flushright}
-	\end{minipage}
+\thispagestyle{empty}
 
-	\vfill
+\begin{minipage}[t]{6cm}
+    \vspace{0pt}%usefull to align top
+    \includegraphics[width=3cm]{template/logo_heig-vd-2020.png}
+\end{minipage}\hfill
+\begin{minipage}[t]{10cm}%
+    \vspace{0pt}%usefull to align top
+    \small%
+    \begin{flushright}%
+        \TBdpt\\
+        \TBfiliere\\
+        \TBorient
+    \end{flushright}
+\end{minipage}
 
-	\begin{center}        
+\vfill
+
+\begin{center}       
     {\large \bfseries Travail de Bachelor}
     
     \vspace{0.8cm}
     
     {\Huge \bfseries \TBtitle}
+    
+    \ifthenelse{\isempty{\TBsubtitle}}{empty}{\Large \TBsubtitle}
+    
+\end{center}
 
-	  \ifthenelse{\isempty{\TBsubtitle}}%
- 			{empty}%empty
-	    {\Large \TBsubtitle}%not empty
-		
-		\ifisconfidential
-	    \vspace{0.8cm}    
-	    {\large \bfseries Confidentiel}
-	  \else
-	  \fi
+\vfill
 
-  \end{center}
-		
-	\vfill
-    
-    \normalsize
-    \begin{tabular}{l@{\hskip 10mm}l}
-    	\textbf{Étudiant} & \textbf{\TBauthor} \\[0.1cm]
-	    \textbf{Enseignant responsable} & \TBsupervisor \\[0.1cm]
-        \ifthenelse{\equal{\TBindustryName}{\empty}}
-        {}
-        {\textbf{Entreprise mandante} & 
-            \begin{minipage}[t]{8cm}
-                \TBindustryContact\\
-                \TBindustryName\\
-                \TBindustryAddress\\
-            \end{minipage} \\[0.1cm]}%
-        \textbf{Année académique} & \TBacademicYears \\[0.1cm]
-    \end{tabular}
-    
-    \vspace{2.0cm}
-    
-	\begin{flushright}
-		Yverdon-les-Bains, le \today
-	\end{flushright}
- 
- 	\cleardoublepage   
+\normalsize
+\begin{tabular}{l@{\hskip 10mm}l}
+    \textbf{Étudiant} & \textbf{\TBauthor} \\[0.1cm]
+    \textbf{Enseignant responsable} & \TBsupervisor \\[0.1cm]
+    \ifthenelse{\equal{\TBindustryName}{\empty}}
+    {}
+    {\textbf{Entreprise mandante} & 
+    \begin{minipage}[t]{8cm}
+        \TBindustryContact\\
+        \TBindustryName\\
+        \TBindustryAddress\\
+    \end{minipage} \\[0.1cm]}%
+    \textbf{Année académique} & \TBacademicYears \\[0.1cm]
+\end{tabular}
+
+\vspace{2.0cm}
+
+\begin{flushright}
+    Yverdon-les-Bains, le \today
+\end{flushright}
+
+\cleardoublepage   
 }
 
 
@@ -79,40 +72,40 @@
 
 \newcommand{\TBsecondTitle}{
 
-  \begin{flushright}
-      \TBdpt\\
-      \TBfiliere\\
-      \TBorient\\
-      Étudiant : \TBauthor\\
-      Enseignant responsable : \TBsupervisor\\
-  \end{flushright}
-  
-  \vspace{0.6cm}
-  
-  \begin{center}
-      {\large Travail de Bachelor \TBacademicYears \\[0.2cm]}
-      {\TBtitle \\[0.5cm]}
-  \end{center}
-  
-  \hrule
-  \vspace{0.5cm}
-  
-  {\bfseries Résumé publiable}
-  
-  {\TBresumePubliable}
+\begin{flushright}
+    \TBdpt\\
+    \TBfiliere\\
+    \TBorient\\
+    Étudiant : \TBauthor\\
+    Enseignant responsable : \TBsupervisor\\
+\end{flushright}
 
-  \vspace{0.5cm}  
-  
-  
-  \begin{tabular}{lll}
-      Étudiant : & Date et lieu : & Signature :  \\[0.3cm]
-      {\TBauthor} & .......................................... &  .......................................... \\[0.8cm]
-      Enseignant responsable : & Date et lieu : & Signature :  \\[0.3cm]
-  
-      {\TBsupervisor} & .......................................... &  .......................................... \\[0.8cm]
-  \end{tabular}
-  
-  \cleardoublepage
+\vspace{0.6cm}
+
+\begin{center}
+    {\large Travail de Bachelor \TBacademicYears \\[0.2cm]}
+    {\TBtitle \\[0.5cm]}
+\end{center}
+
+\hrule
+\vspace{0.5cm}
+
+{\bfseries Résumé publiable}
+
+{\TBresumePubliable}
+
+\vspace{0.5cm}  
+
+
+\begin{tabular}{lll}
+    Étudiant : & Date et lieu : & Signature :  \\[0.3cm]
+    {\TBauthor} & .......................................... &  .......................................... \\[0.8cm]
+    Enseignant responsable : & Date et lieu : & Signature :  \\[0.3cm]
+    
+    {\TBsupervisor} & .......................................... &  .......................................... \\[0.8cm]
+\end{tabular}
+
+\cleardoublepage
 }
 
 
@@ -125,30 +118,30 @@
 
 \newcommand{\TBpreambule}{
 
-  \chapter{Préambule}
-  
-  Ce travail de Bachelor (ci-après TB) est réalisé en fin de cursus d’études, en vue de l'obtention du titre de Bachelor of Science HES-SO en Ingénierie. \\
-  
-  En tant que travail académique, son contenu, sans préjuger de sa valeur, n'engage ni la responsabilité de l'auteur, ni celles du jury du travail de Bachelor et de l'Ecole. \\
-  
-  Toute utilisation, même partielle, de ce TB doit être faite dans le respect du droit d’auteur. \\
-  
-  
-  \begin{flushright}
-      \begin{minipage}{7cm}
-          \vspace{2cm}
-          HEIG-VD \\
-  
-          \vspace{2cm}
-  
-          Vincent Peiris\\
-          Chef de département TIC
-      \end{minipage}\hfill
-  \end{flushright}
-  
-  \vspace{3cm}
-  
-  Yverdon-les-Bains, le \today
+\chapter{Préambule}
+
+Ce travail de Bachelor (ci-après TB) est réalisé en fin de cursus d’études, en vue de l'obtention du titre de Bachelor of Science HES-SO en Ingénierie. \\
+
+En tant que travail académique, son contenu, sans préjuger de sa valeur, n'engage ni la responsabilité de l'auteur, ni celles du jury du travail de Bachelor et de l'Ecole. \\
+
+Toute utilisation, même partielle, de ce TB doit être faite dans le respect du droit d’auteur. \\
+
+
+\begin{flushright}
+    \begin{minipage}{7cm}
+        \vspace{2cm}
+        HEIG-VD \\
+        
+        \vspace{2cm}
+        
+        Vincent Peiris\\
+        Chef de département TIC
+    \end{minipage}\hfill
+\end{flushright}
+
+\vspace{3cm}
+
+Yverdon-les-Bains, le \today
 
 }
 
@@ -164,8 +157,8 @@
 
 \newcommand{\TBauthentification}{
 
-  \chapter{Authentification}
-  
+\chapter{Authentification}
+
 Le soussigné, \TBauthor, atteste par la présente avoir réalisé  ce travail et n’avoir utilisé aucune autre source que celles expressément mentionnées.
 
 \vspace{2cm}
