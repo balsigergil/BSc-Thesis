@@ -7,7 +7,17 @@
 
 \section{Introduction}
 
-La \emph{preuve d'espace} (ou \emph{proof of space} en anglais) est un algorithme de consensus similaire à la preuve de travail à la différence qu'au lieu d'effectuer des calculs de manière continue pour trouver une preuve satisfaisant les conditions de la difficulté de la blockchain, les mineurs appelés farmers avec \emph{PoSpace} vont trouver des preuves à partir d'un challenge grâce à une certaine quantité de données allouées sur le disque dur. Ces données sont générées préalablement par le farmer dans une étape appelée \textbf{plotting}. Ce sont des données pseudo-aléatoires qui ne représentent rien de particulier. D'autres algorithmes pour stocker des données utiles existent comme \emph{proof of catalytic space} ou \emph{proof of replication}.
+La \emph{preuve d'espace} (ou \emph{proof of space} en anglais) est un algorithme de consensus similaire à la preuve de travail à la différence qu'au lieu d'effectuer des calculs de manière continue pour trouver une preuve satisfaisant les conditions de la difficulté de la blockchain, les mineurs appelés farmers avec \emph{PoSpace} vont trouver des preuves à partir d'un challenge grâce à une certaine quantité de données allouées sur le disque dur. 
+
+Il existe principalement deux constructions pour faire du proof of space : une basée sur le compromis temps-mémoire de Hellman \cite{DBLP:conf/asiacrypt/AbusalahACKPR17} et une basée sur des \emph{hard-to-pebble graphs} \cite{DBLP:conf/crypto/DziembowskiFKP15}.
+
+Pour ce travail, il a fallu faire un choix d'un algorithme à implémenter. Ce choix c'est porté sur la construction des compromis temps-mémoire car il y plus de ressources disponibles. De plus, la construction des graphs de type \emph{hard-to-pebble} s'avère être trop compliquée pour un travail comme celui-ci, c'est aussi pourquoi elle a été écartée.
+
+Ce chapitre explique le fonctionnement général du protocole principalement tiré de la blockchain Chia. Les détails d'implémentation sont décrits dans le chapitre suivant [\ref{ch:realisation}].
+
+\section{Résumé du protocole}
+
+Dans un premier temps, les données sont générées par le farmer dans une étape appelée \textbf{plotting}. Ce sont des données pseudo-aléatoires qui ne représentent rien de particulier. D'autres algorithmes pour stocker des données utiles existent comme \emph{proof of catalytic space} ou \emph{proof of replication} utilisés dans la blockchain \href{https://filecoin.io/}{Filecoin} par exemple.
 
 En suite, un farmer peut prouver qu'il a bien les données qu'il dit avoir stockées en trouvant une ou plusieurs preuves répondant à un challenge donné. C'est l'étape du \textbf{farming}.
 
@@ -30,9 +40,17 @@ Ainsi, on peut considérer \emph{proof of space} comme est un protocole dans leq
 
 Le plotting est un procédé non-interactif dans le lequel le farmer va créer les données qui seront stockées et qui permettront de trouver les preuves d'espace liées aux challenges. Ce procédé peut être long, cela peut prendre de plusieurs heures à plusieurs jours suivant la quantité de données allouées.
 
-Le farmer choisi un nombre $k$ qui sera proportionnel à la quantité de données souhaitées. Le processus générera un plot dont la taille sera environ égale à $780 \times k \times 2^{k-10}$ \cite{chia:consensus}. Le temps de la génération dépend de la puissance de l'ordinateur effectuant le plotting comme il s'agit principalement d'exécution de fonctions de hachage, c'est le CPU qui sera beaucoup solicité durant cette étape. Le contenu du plot sera 4 tables de données pseudo-aléatoires. Chaque table contiendra $2^k$ entrées et chaque entrée d'une table $i$ pointra vers 2 entrées dans la table précédente ($i-1$). La première table quant à elle contientra ce qu'on appelle les \emph{x-values}. Ce sont simplement des nombres entiers de $0$ à $2^k-1$. Ainsi. une preuve d'espace correspond à 8 \emph{x-values} ($2^{\textsf{nombre de table} - 1} = 2^3 = 8$).
+La construction de cette preuve d'espace est basée sur la construction de Chia \cite{chia:construction}, elle-même basée sur les compromis temps-mémoire \emph{Beyond Hellman} \cite{DBLP:conf/asiacrypt/AbusalahACKPR17}. Elle a cependant été simplifiée pour pouvoir être réalisée dans le temps imparti de ce travail. 
 
-La construction de cette preuve d'espace est basée sur la construction de Chia \cite{chia:construction}, elle-même basée sur \emph{Beyond Hellman} \cite{DBLP:conf/asiacrypt/AbusalahACKPR17}. Elle a cependant été simplifiée pour pouvoir être réalisée dans le temps imparti de ce travail.
+Le principe
+
+Le farmer choisi un nombre $k$ pour définir combien il souhaite allouer d'espace. La quantité de données finale est exponentielle par rapport à ce nombre $k$. Le processus générera un plot dont la taille sera environ égale à $780 \times k \times 2^{k-10}$ \cite{chia:consensus}. Le temps de la génération dépend de la puissance de l'ordinateur effectuant le plotting puisqu'il s'agit principalement d'exécution de fonctions de hachage. C'est le CPU qui sera beaucoup solicité durant cette étape. Le contenu du plot sera 4 tables de données pseudo-aléatoires. Chaque table contiendra $2^k$ entrées et chaque entrée d'une table $i$ pointra vers 2 entrées dans la table précédente ($i-1$). La première table quant à elle contientra ce qu'on appelle les \emph{x-values}. Ce sont simplement des nombres entiers de $0$ à $2^k-1$. Ainsi. une preuve d'espace correspond à 8 \emph{x-values} ($2^{\textsf{nombre de table} - 1} = 2^3 = 8$). A noter que ce processus à besoin de plus d'espace de stockage qu'indiqué au début car il générera des données qui seront ensuite nettoyées et compressées mais la génération des tables occupera plus de place que la taille finale du plot. C'est important à prendre en considération car pour un plot final de 1 To, il faudra par exemple 1.5 To de libre pour la génération. 
+
+
+
+
+
+Les détails de l'implémentation et des choix réalisés sont décrits dans le chapitre suivant.
 
 \section{Farming}
 
