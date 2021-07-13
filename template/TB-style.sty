@@ -38,7 +38,7 @@
 \usepackage{algorithmic}
 
 % For setting PDF
-\usepackage{hyperref}
+\usepackage[pdfusetitle]{hyperref}
 
 % Bibliography
 \usepackage{biblatex}
@@ -154,14 +154,14 @@
 \makeatletter
 \def\ps@frontmatter{%
   \renewcommand\@evenhead{\footnotesize \leftmark \ \hrulefill}%
-  \renewcommand\@oddhead{\footnotesize \hrulefill \ \TBauthor}%
+  \renewcommand\@oddhead{\footnotesize \hrulefill \ \@author}%
 
   \renewcommand\@evenfoot{\footnotesize \thepage \ \hrulefill}%
   \renewcommand\@oddfoot{\footnotesize \hrulefill \ \thepage}%
 }
 \def\ps@plain{%
   \renewcommand\@evenhead{\footnotesize \leftmark \ \hrulefill}%
-  \renewcommand\@oddhead{\footnotesize \hrulefill \ \TBauthor}%
+  \renewcommand\@oddhead{\footnotesize \hrulefill \ \@author}%
 
   \renewcommand\@evenfoot{\footnotesize \thepage \ \hrulefill}%
   \renewcommand\@oddfoot{\footnotesize \hrulefill \ \thepage}%

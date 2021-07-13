@@ -32,7 +32,7 @@
     
     \vspace{0.8cm}
     
-    {\Huge \bfseries \TBtitle}
+    {\Huge \bfseries \@title}
     
     \ifthenelse{\isempty{\TBsubtitle}}{empty}{\Large \TBsubtitle}
     
@@ -42,7 +42,7 @@
 
 \normalsize
 \begin{tabular}{l@{\hskip 10mm}l}
-    \textbf{Étudiant} & \textbf{\TBauthor} \\[0.1cm]
+    \textbf{Étudiant} & \textbf{\@author} \\[0.1cm]
     \textbf{Enseignant responsable} & \TBsupervisor \\[0.1cm]
     \ifthenelse{\equal{\TBindustryName}{\empty}}
     {}
@@ -76,7 +76,7 @@
     \TBdpt\\
     \TBfiliere\\
     \TBorient\\
-    Étudiant : \TBauthor\\
+    Étudiant : \@author\\
     Enseignant responsable : \TBsupervisor\\
 \end{flushright}
 
@@ -84,7 +84,7 @@
 
 \begin{center}
     {\large Travail de Bachelor \TBacademicYears \\[0.2cm]}
-    {\TBtitle \\[0.5cm]}
+    {\@title \\[0.5cm]}
 \end{center}
 
 \hrule
@@ -99,7 +99,7 @@
 
 \begin{tabular}{lll}
     Étudiant : & Date et lieu : & Signature :  \\[0.3cm]
-    {\TBauthor} & .......................................... &  .......................................... \\[0.8cm]
+    {\@author} & .......................................... &  .......................................... \\[0.8cm]
     Enseignant responsable : & Date et lieu : & Signature :  \\[0.3cm]
     
     {\TBsupervisor} & .......................................... &  .......................................... \\[0.8cm]
@@ -159,7 +159,7 @@ Yverdon-les-Bains, le \today
 
 \chapter{Authentification}
 
-Le soussigné, \TBauthor, atteste par la présente avoir réalisé  ce travail et n’avoir utilisé aucune autre source que celles expressément mentionnées.
+Le soussigné, \@author, atteste par la présente avoir réalisé  ce travail et n’avoir utilisé aucune autre source que celles expressément mentionnées.
 
 \vspace{2cm}
 
@@ -169,7 +169,7 @@ Le soussigné, \TBauthor, atteste par la présente avoir réalisé  ce travail e
 
 \begin{flushright}
     \begin{minipage}{7cm}
-        {\TBauthor}
+        {\@author}
     \end{minipage}\hfill
 \end{flushright}
 
