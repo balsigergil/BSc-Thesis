@@ -1,7 +1,3 @@
-\documentclass[../tb_report.tex]{subfiles}
-
-\begin{document}
-
 \chapter{Proof of space}
 \label{ch:pospace}
 
@@ -70,18 +66,41 @@ Les détails de l'implémentation et des choix réalisés sont décrits dans le 
 
 \section{Farming}
 
-Le \emph{farming} est le processus dans lequel le farmer reçoit un challenge et produit une preuve composé de 8 x-values pour démontrer qu'il a bien alloué l'espace indiqué. Le challenge est une valeur de 256 bits (un hash par exemple). Pour ce faire, le farmer regarde dans la dernière table de son plot si $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(\mathrm{table_4}[i])$, pour $i \in \{0,1,\dots,2^k-1\}$. S'il trouve un correspondance, le farmer parcours les tables dans le sens inverse, de la 4 à la 1, pour retrouver les x-values puisque $\mathrm{table_4}[i]=f_4(x_1,x_2,\dots,x_8)$. Il renvoie ensuite les 8 valeur au vérificateur.
+Le \emph{farming} est le processus dans lequel le farmer reçoit un challenge et produit une preuve composé de 8 x-values pour démontrer qu'il a bien alloué l'espace indiqué. Le challenge est une valeur de 256 bits (un hash par exemple). Pour ce faire, le farmer parcours la dernière table de son plot pour voir si un élément match avec le challenge tel que $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(\mathrm{table_4}[i])$, pour $i \in \{0,1,\dots,2^k-1\}$. S'il trouve une correspondance, le farmer parcours les tables dans le sens inverse, c'est-à-dire de la 4 à la 1, pour retrouver les x-values puisque $\mathrm{table_4}[i]=f_4(x_1,x_2,\dots,x_8)$. Il renvoie ensuite les 8 valeur au vérificateur. Plus de détails sur l'algorithme sont données dans le chapitre suivant \ref{ch:realisation}.
 
-Dans le cas d'une blockchain, le système est non-interactif. La preuve doit pouvoir être vérifiée par n'importe qui à tout moment sans avoir besoin de demande quoi que ce soit au farmer en question. Pour ce faire le challenge doit être généré à partir d'un élément public, par exemple le hash du dernier bloc de la chaîne.
+Dans le cas d'une blockchain, le système est non-interactif. La preuve doit pouvoir être vérifiée par n'importe qui à tout moment sans avoir besoin de demander quoi que ce soit au farmer en question. Pour ce faire le challenge doit être généré à partir d'un élément public, par exemple le hash du dernier bloc de la chaîne. Le nonce utilisé lors de l'initialisation est dans notre cas dérivé de la clé public du farmer et envoyé avec le preuve pour pouvoir être vérifiée par tout le monde.
 
 \section{Vérification}
 
-La vérification consiste à valider une preuve donnée par un farmer. Elle est plutôt simple puisqu'il suffit de recalculer les 4 tables avec uniquement les 8 x-values de la preuve. Ce qui peut être réalisé rapidement car ce n'est que $8 \times 2 - 1 = 15$ exécutions de fonction de hachage qui peuvent être faite en parallèle. Le vérificateur check ensuite la valeur calculée avec le challenge.
+La vérification consiste à valider une preuve donnée par un farmer. Elle est simple puisqu'il suffit de recalculer les 4 tables avec uniquement les 8 x-values de la preuve et la clé publique du farmer. Ce qui peut être réalisé rapidement car ce n'est que environ $(8 \times 2) - 1 = 15$ exécutions de fonction de hachage qui peuvent être faite en parallèle.
+
+La validateur va executer les fonctions de la manière suivante :
+
+\begin{gather*}
+  f_1(x_1), f_1(x_2), f_1(x_3), f_1(x_4), f_1(x_5), f_1(x_6), f_1(x_7), f_1(x_8) \\
+  f_2(x_1,x_2), f_2(x_3,x_4), f_2(x_5,x_6), f_2(x_7,x_8) \\
+  f_3(x_1,x_2,x_3,x_4), f_3(x_5,x_6,x_7,x_8) \\
+  f_4(x_1,x_2,x_3,x_4,x_5,x_6,x_7,x_8)
+\end{gather*}
+
+Il va vérifier que les sorties correspondent bien, c'est-à-dire que toutes les sorties de la fonction \textsf{M} soient égales à \texttt{vrai} :
+
+\begin{gather*}
+  \mathsf{M}(f_1(x_1), f_1(x_2)),\mathsf{M}(f_1(x_3), f_1(x_4)),\dots \\
+  \mathsf{M}(f_2(x_1,x_2),f_2(x_3,x_4)),\mathsf{M}(f_2(x_5,x_6),f_2(x_7,x_8)) \\
+  \mathsf{M}(f_3(x_1,x_2,x_3,x_4), f_3(x_5,x_6,x_7,x_8))
+\end{gather*}
+
+Avec la fonction $\mathsf{M}(y_1,y_2)$ qui retourne \texttt{vrai} si et seulement $y_1 = y_2 + 1$.
+
+Le vérificateur regarde ensuite si la valeur calculée correspond avec le challenge initial.
 
 \section{Sécurité et attaques}
 
-Comme vu dans le chapitre sur les protocoles de consensus, \emph{proof of space} a des avantages écologiques puisque le calcul n'est réalisé qu'une fois au début lors de la génération du plot. Cela signifie que la génération de preuve ne requiert que très peu de puissance calcul et que par conséquent elle peut être exécutée rapidement à la différence de proof of work. Cela implique qu'un attaquant peut forger des blocs en avance, générer leur preuve respective et les broadcasté sur le réseau. Si ces blocs sont valides ils pourraient être acceptés par le réseau qui se base automatiquement sur la plus longue chaîne de blocs. Il y aurait du coup la possibilité pour des attaquant d'effectuer des actes de double dépenses.
+Comme vu dans le chapitre sur les protocoles de consensus, \emph{proof of space} a des avantages écologiques puisque le calcul n'est réalisé qu'une fois au début lors de la génération du plot. Cela signifie que la génération de preuve ne requiert que très peu de puissance calcul et que par conséquent elle peut être exécutée rapidement à la différence de proof of work. Cela implique qu'un attaquant peut forger des blocs en avance, générer leur preuve respective et les broadcaster sur le réseau. Si ces blocs sont valides ils pourraient être acceptés par le réseau qui se base automatiquement sur la plus longue chaîne de blocs. Il y aurait du coup la possibilité pour des attaquant d'effectuer des actes de double dépenses.
 
-Pour palier à ce problème, la blockchain Chia utilise des preuves de temps (proofs of time en anglais) basées sur des \emph{Verifiable Delay Functions} afin de vérifier qu'un certain c'est réellement écoulé et empêcher la création de bloc à l'avance.
+Pour palier à ce problème, la blockchain Chia utilise des preuves de temps (proofs of time en anglais) basées sur des \emph{Verifiable Delay Functions} afin de vérifier qu'un certain c'est réellement écoulé et empêcher la création de bloc à l'avance. Ces fonctions particulières prennent un temps réel à s'exécuter et ne peuvent pas être parallélisées. Par contre la vérification de la preuve de temps est elle réalisable rapidement. Techniquement, la blockchain utilise des exponentiations répétées sur des groupes d'ordre inconnus \cite{DBLP:conf/crypto/BonehBBF18} \cite{DBLP:conf/innovations/Pietrzak19a} \cite{DBLP:conf/eurocrypt/Wesolowski19}.
 
-\end{document}
+Malheureusement pour des raisons de temps, il n'a pas été possible d'implémenter durant ce travail un système de \emph{proof of time} comme l'a fait Chia. 
+
+Un autre problème de sécurité peut survenir avec cet algorithme si la valeur de $k$, la paramètre d'espace, est trop faible. Si c'est le cas, alors un attaquant pourrait regénérer le plot trop rapidement dû à sa petite taille. Il pourrait alors générer des plots et des preuves à la volée sans stocker de données sur disque. C'est pour cela qu'une valeur minimum est codée en dur dans le code source du protocole.
