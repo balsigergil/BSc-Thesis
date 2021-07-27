@@ -3,17 +3,17 @@
 
 \section{Qu'est-ce qu'une cryptomonnaie ?}
 
-Dans un premier temps, il est nécessaire de comprendre comment fonctionnent une cryptomonnaie avant de pouvoir en créer une. Et il faut tout d'abord pouvoir définir \emph{qu'est-ce qu'une cryptomonnaie}.
+Dans un premier temps, il est nécessaire de comprendre comment fonctionne une cryptomonnaie avant de pouvoir en créer une. Et il faut tout d'abord pouvoir définir \emph{qu'est-ce qu'une cryptomonnaie}.
 
-Une cryptomonnaie est un ensemble de mécanismes cryptographiques utilisés dans le but de sécuriser un registre distribué afin d'obtenir un système de paiement décentralisé. Plus simplement, une cryptomonnaie est un système de paiement qui n'est pas régit par une entité centrale, comme une banque par exemple, et qui permet à tout le monde d'émettre des transactions qui seront incluses dans un registre. Ce registre est publique et partagé avec tous les utilisateurs via un réseau pair-à-pair.
+Une cryptomonnaie est un ensemble de mécanismes cryptographiques utilisés dans le but de sécuriser un registre distribué afin d'obtenir un système de paiement décentralisé. Plus simplement, une cryptomonnaie est un système de paiement qui n'est pas régit par une entité centrale, comme une banque par exemple, et qui permet à tout le monde d'émettre des transactions qui seront incluses dans un registre. Ce registre est publique et partagé avec tous les utilisateurs via un réseau pair-à-pair. Le plus souvent, ce registre est représenté sous forme de chaîne de blocs, chaque bloc contenant ou un certain nombre de transactions. C'est la \emph{blockchain}. 
 
-Mais comme partout, il y a des personnes hônnetes mais aussi des gens malhônnetes qui vont essayer d'abuser des failles du système. Dans le cas d'un système de paiement décentralisé, il n'y a pas de banque pour vérifier la validité des transactions ce qui pose un réel problème de sécurité. Du coup, pour rendre le système sûr, on utilise de la cryptographie. La cryptographie, grâce à des preuves mathématiques, rend la validité (ou non) des transactions quasiement irréfutable et permet à n'import qui de vérifier les transactions stockées dans le registre.
+Mais comme partout, il y a des personnes hônnetes mais aussi des gens malhônnetes qui vont essayer d'abuser des failles du système. Dans le cas d'un système de paiement décentralisé, il n'y a pas de banque pour vérifier la validité des transactions ce qui pose un réel problème de sécurité. Du coup, pour rendre le système sûr, on utilise de la cryptographie. La cryptographie, grâce à des preuves mathématiques, rend la validité (ou non) des transactions quasiement irréfutable et permet à n'importe qui de vérifier les transactions stockées dans la blockchain.
 
-Chaque utilisateur possède une copie de ce registre de transactions sur son ordinateurs en local et peut recevoir de nouvelles transactions d'autres utilisateurs et en envoyer lui-même. Chaque utilisateur vérifie les transactions entrantes et les ajoute à son registre si elles sont correctes.
+Chaque utilisateur possède une copie de cette blockchain sur son ordinateurs et peut recevoir de nouvelles transactions d'autres utilisateurs et en envoyer lui-même. Voyons maintenant comment fonctionne plus en détails une blockchain avec un exemple compréhensible dans la section suivante.
 
 \section{La blockchain}
 
-Comme vu ci-dessus, une cryptomonnaie est en fait un simple registre numérique dans lequel chacun peut ajouter des transactions. Imaginons maintenant un exemple simple avec les utilisateurs Alice, Bob et Charlie. Chacun d'entre eux peut ajouter une ligne au registre qui dit par exemple << Alice paie Bob 5 CHF >>, << Bob paie Charlie 8 CHF >>. Et, à interval régulier, ils se regroupent pour se transmettre l'argent indiqué dans le registre.
+Comme vu ci-dessus, une cryptomonnaie est en fait un simple registre numérique dans lequel chacun peut ajouter des transactions. Imaginons maintenant un exemple simple avec les utilisateurs Alice, Bob et Charlie. Chacun d'entre eux peut ajouter une ligne au registre qui dit par exemple << Alice paie Bob 5 CHF >>, << Bob paie Charlie 8 CHF >>. Et, à interval régulier, ils se regroupent pour se transmettre l'argent qu'ils ont indiqué dans le registre.
 
 \begin{figure}[H]
   \centering
@@ -29,9 +29,9 @@ Seulement rien n'empêche Bob de rajouter la première ligne << Alice paie Bob 5
   \caption{Bob inscrit de fausses transactions dans le registre}
 \end{figure}
 
-C'est là que la cryptographie rentre en jeu. Plus précisément les \glspl{signature}. Chaque transaction va être accompagnée d'une signature. Les signatures numériques reposent sur de la \gls{crypto_asym}. C'est à dire que chaque utilisateur possède une pair de clé : une clé publique $pk$ et une clé privée ou secrète $sk$. La clé publique est partagée avec les autres utilisateurs du registre alors que la clé privée reste bien cachée chez son propriétaire et n'est jamais divulguée.
+C'est là que la cryptographie rentre en jeu. Plus précisément les \glspl{signature}. Chaque transaction va être accompagnée d'une signature. Les signatures numériques reposent sur de la \gls{crypto_asym}. C'est à dire que chaque utilisateur possède une pair de clé : une clé publique $pk$ et une clé privée (ou secrète) $sk$. La clé publique de chaque personne est partagée avec tous les autres utilisateurs du registre alors que la clé privée reste bien cachée chez son propriétaire et n'est jamais divulguée à qui que ce soit.
 
-À la différence des signatures manuscrites sur papier qui sont à chaque fois presque identiques, une signature numérique change en fonction du message à signer et de la clé secrète. On peut imaginer la signature d'un message $m$ avec la fonction suivante :
+À la différence des signatures manuscrites sur papier qui sont à chaque fois presque identiques, une signature numérique change en fonction du message à signer. Pour signer ce message, on utilise la clé privée. On peut alors imaginer la signature d'un message $m$ avec la fonction suivante :
 
 \begin{equation*}
   \mathsf{Sign(m, sk)} = \mathsf{signature}
