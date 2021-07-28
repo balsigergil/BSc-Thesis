@@ -11,7 +11,7 @@ Pour ce travail, il a fallu faire un choix d'un algorithme à implémenter. Ce c
 
 Ce chapitre explique le fonctionnement général du protocole principalement tiré de la blockchain Chia. Les détails d'implémentation sont décrits dans le chapitre suivant [\ref{ch:realisation}].
 
-\section{Résumé du protocole}
+\section{Protocole}
 
 Dans un premier temps, les données sont générées par le farmer dans une étape appelée \textbf{plotting}. Ce sont des données pseudo-aléatoires qui ne représentent rien de particulier. D'autres algorithmes pour stocker des données utiles existent comme \emph{proof of catalytic space} ou \emph{proof of replication} utilisés dans la blockchain \href{https://filecoin.io/}{Filecoin} par exemple.
 
@@ -32,7 +32,7 @@ Ainsi, on peut considérer \emph{proof of space} comme est un protocole dans leq
   \caption{Diagramme du protocole \emph{proof of space} montrant les différentes étapes. Tiré de \cite{chia:consensus}}
 \end{figure}
 
-\section{Plotting}
+\subsection{Plotting}
 
 Le plotting est un procédé non-interactif dans le lequel le farmer va créer les données qui seront stockées et qui permettront de trouver les preuves d'espace liées aux challenges. Ce procédé peut être long, cela peut prendre de plusieurs heures à plusieurs jours suivant la quantité de données allouées.
 
@@ -64,13 +64,13 @@ Une fois les 4 tables générées, on peut commencer à faire du \textbf{farming
 
 Les détails de l'implémentation et des choix réalisés sont décrits dans le chapitre suivant.
 
-\section{Farming}
+\subsection{Farming}
 
 Le \emph{farming} est le processus dans lequel le farmer reçoit un challenge et produit une preuve composé de 8 x-values pour démontrer qu'il a bien alloué l'espace indiqué. Le challenge est une valeur de 256 bits (un hash par exemple). Pour ce faire, le farmer parcours la dernière table de son plot pour voir si un élément match avec le challenge tel que $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(\mathrm{table_4}[i])$, pour $i \in \{0,1,\dots,2^k-1\}$. S'il trouve une correspondance, le farmer parcours les tables dans le sens inverse, c'est-à-dire de la 4 à la 1, pour retrouver les x-values puisque $\mathrm{table_4}[i]=f_4(x_1,x_2,\dots,x_8)$. Il renvoie ensuite les 8 valeur au vérificateur. Plus de détails sur l'algorithme sont données dans le chapitre suivant \ref{ch:realisation}.
 
 Dans le cas d'une blockchain, le système est non-interactif. La preuve doit pouvoir être vérifiée par n'importe qui à tout moment sans avoir besoin de demander quoi que ce soit au farmer en question. Pour ce faire le challenge doit être généré à partir d'un élément public, par exemple le hash du dernier bloc de la chaîne. Le nonce utilisé lors de l'initialisation est dans notre cas dérivé de la clé public du farmer et envoyé avec le preuve pour pouvoir être vérifiée par tout le monde.
 
-\section{Vérification}
+\subsection{Vérification}
 
 La vérification consiste à valider une preuve donnée par un farmer. Elle est simple puisqu'il suffit de recalculer les 4 tables avec uniquement les 8 x-values de la preuve et la clé publique du farmer. Ce qui peut être réalisé rapidement car ce n'est que environ $(8 \times 2) - 1 = 15$ exécutions de fonction de hachage qui peuvent être faite en parallèle.
 
@@ -104,3 +104,47 @@ Pour palier à ce problème, la blockchain Chia utilise des preuves de temps (pr
 Malheureusement pour des raisons de temps, il n'a pas été possible d'implémenter durant ce travail un système de \emph{proof of time} comme l'a fait Chia. 
 
 Un autre problème de sécurité peut survenir avec cet algorithme si la valeur de $k$, la paramètre d'espace, est trop faible. Si c'est le cas, alors un attaquant pourrait regénérer le plot trop rapidement dû à sa petite taille. Il pourrait alors générer des plots et des preuves à la volée sans stocker de données sur disque. C'est pour cela qu'une valeur minimum est codée en dur dans le code source du protocole.
+
+\section{Consensus}
+
+\lipsum[1]
+
+\section{Implémentation}
+
+\lipsum[1]
+
+\subsection{Plotting}
+
+\lipsum[1]
+
+\subsubsection*{Concepts}
+
+\lipsum[1]
+
+\subsubsection*{Algorithmes}
+
+\lipsum[1]
+
+\subsection{Génération de preuves}
+
+\lipsum[1]
+
+\subsection{Vérification}
+
+\lipsum[1]
+
+\section{Résultats}
+
+\lipsum[1]
+
+\subsection{Performances}
+
+\lipsum[1]
+
+\subsection{Comparaison du calcul des matchs}
+
+\lipsum[1]
+
+\subsection{Comparaison avec Chia}
+
+\lipsum[1]
