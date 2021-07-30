@@ -1,0 +1,24 @@
+pub fn matching_naive(yl: i64, yr: i64) -> bool {
+    let b = 119;
+    let c = 127;
+    let bc = b * c;
+
+    let bl = yl / bc;
+    let br = yr / bc;
+
+    if bl + 1 != br {
+        return false;
+    }
+
+    for m in 0..64 {
+        if (((yr % bc) / c - ((yl % bc) / c)) - m) % b == 0 {
+            let mut c_diff = 2 * m + (bl % 2);
+            c_diff *= c_diff;
+
+            if (((yr % bc) % c - ((yl % bc) % c)) - c_diff) % c == 0 {
+                return true;
+            }
+        }
+    }
+    return false;
+}

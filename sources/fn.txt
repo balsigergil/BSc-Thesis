@@ -1,0 +1,30 @@
+pub fn calculate_fn(
+    &self,
+    y1: &BitsSlice,
+    left: &BitsSlice,
+    right: &BitsSlice,
+) -> (Bits, Bits) {
+    let mut input = Bits::new();
+    let mut c = Bits::new();
+    let mut hasher = blake3::Hasher::new();
+
+    if self.table_index < 4 {
+        c.extend_from_bitslice(left);
+        c.extend_from_bitslice(right);
+    }
+
+    input.extend_from_bitslice(y1);
+    input.extend_from_bitslice(left);
+    input.extend_from_bitslice(right);
+
+    hasher.update(input.as_raw_slice());
+
+    let hash = hasher.finalize().as_bytes().view_bits::<Lsb0>().to_bitvec();
+    let output = hash[0..(self.k + 6)].to_bitvec();
+
+    if self.table_index >= 4 && self.table_index < 7 {
+        c = hash[0..collation_size_bits(self.table_index + 1, self.k)].to_bitvec();
+    }
+
+    return (output, c);
+}

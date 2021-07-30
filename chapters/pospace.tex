@@ -151,13 +151,78 @@ Comme expliqué précédemment, chaque entrée pointe vers deux entrées dans la
 
 La génération des tables comporte plusieurs phases. Une première phase où on génère les tables et des phases ensuite où on supprime, trie et réordonne les entrées des tables pour optimiser le stockage et la recherche. Seule la phase 1 est implémentée et sera présentée ci-dessous.
 
-La phase 1 consiste à générer les tables de la 1 à la 7. On commence donc par la table 1. On calcule $f_1(x)$ pour $x \in \{0,\dots,2^k-1\}$. La fonction $f_1$ est simplement un ChaCha8 avec la plot seed en clé. On utilise ChaCha comme PRNG avec un nombre réduit de rounds pour la vitesse.
+La phase 1 consiste à générer les tables de la 1 à la 7. On commence donc par la table 1. On calcule $f_1(x)$ pour $x \in \{0,\dots,2^k-1\}$. La fonction $f_1$ est simplement un ChaCha8 avec la plot seed en clé. On utilise ChaCha comme \acrshort{prng} avec un nombre réduit de rounds pour la vitesse.
 
 \inputsourcecode{rust}{"sources/f1.txt"}{Calcule de la fonction $f_1$}
 
-Pour simplifier la compréhension de cette fonction: les entrées sont 0, 1, 2, \dots, $2^k-1$. La sortie pour 0 sera les $k$ premiers bits du keystream. Pour la sortie de 1 ce sera la $k$ bits suivant et ainsi de suite jusqu'à $2^k-1$. On peut remarqué qu'il y a une extension rajoutée à la fin (ligne 28-29). On rajoute ici 6 bits au keystream ce qui fait que $f_1(x)$ prend $k$ bits en entrée et sort $k+6$ bits en sortie. Ces 6 bits sont les bits de poids forts de $x$, ceci dans le but de minimiser les collisions. 
+Pour simplifier la compréhension de cette fonction: les entrées sont 0, 1, 2, \dots, $2^k-1$. La sortie pour 0 sera les $k$ premiers bits du keystream. La sortie de 1 ce sera les $k$ bits suivant et ainsi de suite jusqu'à $2^k-1$. On peut remarqué qu'il y a une extension rajoutée à la fin (ligne 28-29). On rajoute ici 6 bits au keystream ce qui fait que $f_1(x)$ prend $k$ bits en entrée et sort $k+6$ bits en sortie. Ces 6 bits sont les bits de poids forts de $x$, ceci dans le but de minimiser les collisions (paradoxe des anniversaires). Le nonce lui est défini à 0. Il n'a pas d'importance puisqu'on utilise la \emph{plot seed} comme graine pour le PRNG. Cette plot seed est unique pour chaque farmer.
 
-On stocke ensuite les entrées, les \emph{x-values} ($0,1,2,\dots,2^k-1$) accompagnée de leur valeur de sortie de $f_1$ respective sur le disque et on trie les entrée de la table par les valeurs de sortie. La table 1 est maintenant terminée et on peut passer à la table 2.
+On stocke ensuite les entrées, les \emph{x-values} ($0,1,2,\dots,2^k-1$) accompagnées de leur valeur de sortie respective de $f_1$ sur le disque. On les trie par les valeurs de sortie pour optimiser la recherche de matchs lors du calcul de la table suivante. La table 1 est maintenant terminée et on peut passer à la table 2.
+
+Pour construire la deuxième table, il nous faut collecter les valeurs de sortie (les $f_1(x)$) de la table 1 qui, deux par deux, satisfont la \emph{matching function}. En pratique la matching function est :
+
+\inputsourcecode{rust}{"sources/match_naive.txt"}{Fonction de matching naïve}
+
+Cette fonction illustre bien les conditions de match entre deux éléments mais n'est pas très performante car possède une complexité de $\bigO(6N^2)$ avec $N$ la taille d'un bucket \cite{chiapos}. Un bucket est un sous-ensemble d'une table. Pour savoir dans quel bucket se trouve une entrée on fait: $\mathsf{bucket\_id} = \lfloor\frac{y_i}{119 * 127}\rfloor$. La première condition de la matching function est que les bucket\_id des 2 entrées soient adjacents. C'est-à-dire que $\mathsf{bucket\_id_{yl}} + 1 = \mathsf{bucket\_id_{yr}}$. Cela permet de réduire les lectures sur le disque pour trouver les matchs car les éléments sont proches les uns des autres. C'est pour cela que les tables doivent être triées par les valeurs de sortie des fonctions de hachage. La deuxième condition est assez complexe. Elle sert à éviter des cycles entre les entrées si on représente l'ensemble sous forme de graph. Ces cycles peuvent être compressés ce qui représente une potentielle attaque car ça permettrait d'optimiser le stockage. C'est pour cela que les paramètres $B = 119$ et $C = 127$ ont ces valeurs. Les preuves mathématiques sont assez complexes et vont au-delà du périmètre de ce travail mais sont expliquées dans leur document de construction \cite{chia:construction}.
+
+Ensuite, pour chaque couple $(y_1=f_1(x_1), y_2=f_1(x_2))$ tel que $\textsf{M}(y_1, y_2) = \textsf{Vrai}$, on calcule la fonction $f_2$ sur les \emph{x-values}:
+\begin{equation*}
+  f_2(x_1,x_2) = \underset{k + 6}{\textsf{trunk}}(\textsf{BLAKE3}(x_1\|x_2))
+\end{equation*}
+
+On stocke ensuite les sorties de $f_2$ en gardant en mémoire l'emplacement des x-values dans la table 1. Pour ce faire, et comme il y a 2 valeurs à mémoriser, on va utiliser des index dans la table 1 sous forme de << position >> et d'<< offset >>. La position est un nombre entier indiquant où se signature la première valeur ($x_1$) dans la table 1 et l'offset est aussi un nombre entier qui lui indique où la deuxième valeur ($x_2$) se situe par rapport à la première. Techniquement cela permet d'optimiser le stockage car comme les entrées sont triées par $f_1(x_i)$ et que $f_1(x_1) + 1 = f_1(x_2)$, l'offset se sera jamais très grande et peut être stocké sur moins de bits. 
+
+Voici ci-dessous le code permettant de trouver les matchs à stocker dans la table 2 :
+
+\inputsourcecode{rust}{"sources/core.txt"}{Calcul des matchs pour la table 2}
+
+Dans le code ci-dessus, on utilise un version optimisée de la fonction de matching présentée précédemment. Dans un premier temps, on place les entrées de la table 1 dans un bucket gauche ou droite en fonction de leur bucket\_id (\verb|y_bucket| dans le code ci-dessus). On peut le faire avec une seule boucle car les entrées sont triée par \verb|entry.fx|. Une fois les buckets de gauche et de droite rempli, on regarde s'il y a des matchs entre les deux buckets. La fonction \verb|fx.find_matches| n'a besoin que de vérifier la deuxième condition. La première étant déjà vérifiée en plaçant correctement les entrées à droite ou à gauche.
+
+Maintenant, pour chaque match trouvé il faut calculer $f_2(x_1,x_2)$ :
+
+\inputsourcecode{rust}{"sources/core_f2.txt"}{Calcul de $f_2$ pour chaque match}
+
+On peut remarquer que la fonction \verb|calculate_fn| prend en fait 3 entrées: $f_1(x_1)$ (\verb|left_entry.fx|), $x_1$ (\verb|left_entry.metadata|) et $x_2$ (\verb|right_entry.metadata|). En plus de hacher $x_1$ et $x_2$, elle va aussi hacher $f_1(x_1)$. Cela permet de s'assurer que les tables se font bien l'une après l'autre et qu'on ne saute pas de table. Ainsi on ne peut pas commencer par la table 7 et essayer de trouver des matchs, les preuves résultantes seraient refusées par le réseau qui applique le bon algorithme.
+
+La fonction $f_2$, en plus de retourner le hash, va également retourner une version concaténée des entrées ($x_1\|x_2$) que l'on va stocker avec la sortie, la position et l'offset. Cela sera utile pour pouvoir calculer les tables suivantes. Cette concaténation également effectuée par la fonction \verb|calculate_fn| n'est simplement une concaténation car cela donnerait des données en sortie trop grande au moment de le faire sur les dernières table et limiter le nombre de bits en sortie de la concaténation permet d'obliger un attaquant souhaitant faire une attaque de Hellman à stocker des bits supplémentaires ou faire plus de recherche sur le disque \cite{chia:construction}. C'est pourquoi la \emph{collation} est tronkée à $x \times k$ bits avec $x$ qui change en fonction de la table qu'on est en train de calculer. La valeur de $x$ permet d'assurer que le compromis temps-mémoire est plus coûteux qu'en calculant de manière honnête \cite{chia:construction}. Cette \emph{collation} est stockée dans les metadatas de l'entrée pour permettre un calcul facile pour les tables suivante car ces metadatas seront utilisées comme entrée dans \verb|calculate_fn| lors du calcul de la prochaine table.
+
+Voici ci-dessous le code de la fonction \verb|calculate_fn| :
+
+\inputsourcecode{rust}{"sources/fn.txt"}{calculate\_fn}
+
+Après avoir haché les 3 valeurs ensemble, on calcul la valeur de concatenation (\emph{collation}). De la table 2 à 3, c'est simplement une concatenation: $x_1\|x_2$ et $x_1\|x_2\|x_3\|x_4$. Mais ensuite, de la table 4 à 7, la valeur de la collation vaut aussi le hash que qui vient d'être calculé mais est lui tronqué à $x \times k$ bits au lieu de $k + 6$ bits.
+
+Il faut encore trier les entrées de la table 2 par $f_2$ et la génération de la seconde table est terminée.
+
+Il reste plus que 5 tables, mais heureusement le calcul est identique à la table 2. Il suffit de lire la table 2, trouver les matchs, calculer $f_3$ avec la même méthode (\verb|calculate_fn|) et stocker les valeurs dans la table 3. Et ainsi de suite jusqu'à la table 7.
+
+Pour mieux visualiser, voici un tableau récapitulatif, tiré de \cite{chia:construction}, de ce que devrait contenir chaque table après cette première phase :
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{l l l}
+    \textbf{Table} & \textbf{Données} & \textbf{Tri} \\
+    \hline
+    \hline
+    $\mathrm{Table_1}$ & $f_1,x$ & Trié par $f_1$ \\
+    \hline
+    $\mathrm{Table_2}$ & $f_2,\mathrm{pos_1},\mathrm{offset},C_3$ & Trié par $f_2$ \\
+    \hline
+    $\mathrm{Table_3}$ & $f_3,\mathrm{pos_2},\mathrm{offset},C_4$ & Trié par $f_3$ \\
+    \hline
+    $\mathrm{Table_4}$ & $f_4,\mathrm{pos_3},\mathrm{offset},C_5$ & Trié par $f_4$ \\
+    \hline
+    $\mathrm{Table_5}$ & $f_5,\mathrm{pos_4},\mathrm{offset},C_6$ & Trié par $f_5$ \\
+    \hline
+    $\mathrm{Table_6}$ & $f_6,\mathrm{pos_5},\mathrm{offset},C_7$ & Trié par $f_6$ \\
+    \hline
+    $\mathrm{Table_7}$ & $f_7,\mathrm{pos_6},\mathrm{offset}$ & Trié par $f_7$ \\
+    \hline
+  \end{tabular}
+  \caption{Contenu des table 1 à 7 après la 1ère phase}
+\end{table}
+
+$C_3$ à $C_7$ sont justement les \emph{collations} calculées pour la table suivante.
 
 \subsection{Génération de preuves}
 
@@ -173,12 +238,22 @@ On stocke ensuite les entrées, les \emph{x-values} ($0,1,2,\dots,2^k-1$) accomp
 
 \subsection{Performances}
 
-\lipsum[1]
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=13cm]{images/bench_ssd_hdd.png}
+  \caption{Comparaison du plotting en fonction de $k$}
+\end{figure}
 
 \subsection{Comparaison du calcul des matchs}
 
-\lipsum[1]
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=14cm]{images/bench_matching.png}
+  \caption{Comparaison des fonctions de matching en fonction de $k$}
+\end{figure}
 
 \subsection{Comparaison avec Chia}
+
+\section{Améliorations possibles}
 
 \lipsum[1]
