@@ -194,6 +194,8 @@ Après avoir haché les 3 valeurs ensemble, on calcul la valeur de concatenation
 
 Il faut encore trier les entrées de la table 2 par $f_2$ et la génération de la seconde table est terminée.
 
+% TODO parler du tri on disk
+
 Il reste plus que 5 tables, mais heureusement le calcul est identique à la table 2. Il suffit de lire la table 2, trouver les matchs, calculer $f_3$ avec la même méthode (\verb|calculate_fn|) et stocker les valeurs dans la table 3. Et ainsi de suite jusqu'à la table 7.
 
 Pour mieux visualiser, voici un tableau récapitulatif, tiré de \cite{chia:construction}, de ce que devrait contenir chaque table après cette première phase :
@@ -226,7 +228,23 @@ $C_3$ à $C_7$ sont justement les \emph{collations} calculées pour la table sui
 
 \subsection{Génération de preuves}
 
-\lipsum[1]
+On a maintenant un plot avec 7 tables. Certes il est améliorable, on peut quand même trouver des preuves pour un challenge. Il nous suffit de regarder si on a, dans la table 7, une ou plusieurs entrées qui satisfont $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(f_7)$. Si c'est le cas, on va chercher les 2 entrées dans la table 6 grâce à la position et l'offset enregistré dans l'entrée de la table 7. Comme chaque entrée pointe vers 2 entrées dans la table précédente, on obtient 64 entrées arrivé à la table 1. Ces 64 valeurs forme la preuve comme vu précédemment.
+
+Pour l'implémentation, c'est plus simple que la génération de plot car on a juste à parcourir la  table 7. Pour les autres tables on peut lire directement l'entrée stockée sur le disque ce qui est assez rapide.
+
+Dans le code ci-dessous, on sélectionne les entrées dans la table 7 qui correspondent au challenge tronqué à $k$ bits. Comme la table peut être très grande, elle risque de ne pas pouvoir être entièrement chargée en RAM. C'est pourquoi on la lit chunks par chunks.
+
+\inputsourcecode{rust}{"sources/prove_1.txt"}{Sélection des entrées dans la table 7}
+
+Dès qu'on a les entrées de la table 7, on parcours les 6 autres table de la 6 à 1. Le code ci-dessous montre le processus réalisé de manière itérative car plus performant que récursif. On récupère, pour chaque entrée, les 2 entrées parentes grâce à la position et à l'offset stocké durant le plotting. On ajoute ensuite les entrées dans un tableau qui devra contenir 64 éléments à la fin de l'algorithme.
+
+\inputsourcecode{rust}{"sources/prove_2.txt"}{Parcours des 6 tables pour récupèrer les x-values}
+
+Ainsi, il est possible de réunir toutes ces informations en une structure afin de pouvoir être vérifiée facilement :
+
+\inputsourcecode{rust}{"sources/prove_3.txt"}{Structure d'une preuve}
+
+Avec les données de la structure ci-dessus, n'importe qui peut vérifier la preuve en recalculant les fonctions.
 
 \subsection{Vérification de preuves}
 
@@ -251,6 +269,8 @@ $C_3$ à $C_7$ sont justement les \emph{collations} calculées pour la table sui
   \includegraphics[width=14cm]{images/bench_matching.png}
   \caption{Comparaison des fonctions de matching en fonction de $k$}
 \end{figure}
+
+\subsection{Tests unitaires et d'intégration}
 
 \subsection{Comparaison avec Chia}
 

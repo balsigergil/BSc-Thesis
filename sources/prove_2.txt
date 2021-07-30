@@ -1,0 +1,40 @@
+for table7_entry in potential_proof_entries {
+    let mut entries_buffer = Vec::new();
+    let mut temp_buffer = Vec::new();
+    entries_buffer.push(table7_entry);
+
+    // Going from table 6 to table 1
+    for i in (1..=6).rev() {
+        for entry in &entries_buffer {
+            let pos = entry.position;
+            let offset = entry.offset;
+            let entry_size = plotentry_size(i, self.k);
+
+            let mut table_i = File::open(
+                self.data_path
+                    .join(format!(table_final_filename_format!(), i)),
+            )?;
+
+            let mut buffer = vec![0u8; entry_size];
+
+            // Retrieve left entry
+            table_i.seek(SeekFrom::Start(pos * entry_size as u64));
+            table_i.read_exact(&mut buffer);
+            let left_entry: PlotEntry = bincode::deserialize(&buffer);
+
+            // Retrieve right entry
+            table_i.seek(SeekFrom::Start((pos + offset) * entry_size as u64));
+            table_i.read_exact(&mut buffer);
+            let right_entry: PlotEntry = bincode::deserialize(&buffer);
+
+            // Both entries to temporary buffer
+            temp_buffer.push(left_entry);
+            temp_buffer.push(right_entry);
+        }
+
+        // Move the values from the temp buffer in the final buffer
+        entries_buffer.clear();
+        entries_buffer.append(&mut temp_buffer);
+    }
+    proofs.push(entries_buffer);
+}

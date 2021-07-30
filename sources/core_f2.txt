@@ -11,14 +11,8 @@ for match_item in matches {
     let new_entry = PlotEntry {
         fx: y,
         metadata: Some(collate.as_raw_slice().to_vec()),
-        position: Some(
-            left_entry
-                .position
-                .ok_or(PoSpaceError::EmptyPosition)?,
-        ),
-        offset: Some(
-            right_entry.position - left_entry.position,
-        ),
+        position: Some(left_entry.position),
+        offset: Some(right_entry.position - left_entry.position),
     })
 
     // On stock new_entry sur le disque

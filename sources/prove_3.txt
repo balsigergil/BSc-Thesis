@@ -1,0 +1,6 @@
+pub struct Proof {
+    pub x_values: Vec<u64>,
+    pub challenge: Vec<u8>,
+    pub k: usize,
+    pub plot_seed: [u8; 32],
+}

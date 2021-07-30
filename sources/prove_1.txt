@@ -1,0 +1,7 @@
+match chunk_reader.read_chunk() {
+    Ok(entries) => {
+        let potential_proof_entries: Vec<PlotEntry> = entries
+            .into_par_iter()
+            .filter(|entry| to_bits(entry.fx, self.k + PARAM_EXT)[..self.k] == target)
+            .collect();
+    // ....
