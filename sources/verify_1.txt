@@ -1,0 +1,5 @@
+for x in &proof.x_values {
+    let fx = f1_calculator.calculate_f1(&BitsWrapper::from(*x, proof.k));
+    fx_values.push(fx);
+    metadata.push(to_bits(*x, proof.k));
+}

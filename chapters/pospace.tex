@@ -248,7 +248,24 @@ Avec les données de la structure ci-dessus, n'importe qui peut vérifier la pre
 
 \subsection{Vérification de preuves}
 
-\lipsum[1]
+Pour vérifier une preuve, on a besoin que de 4 ingrédients: les \emph{x-values} représentant la preuve d'espace, le paramètre $k$ et la plot seed, et aussi le challenge pour la vérification finale. Le procédé est plus ou moins le même que pour le plotting, c'est-à-dire qu'on exécute les mêmes fonctions mais on ne génère pas toute la table. On calcule uniquement les hashs des x-values de la preuve pour pouvoir vérifier que :
+
+\begin{enumerate}
+  \item les hash vérifient la fonction de matching,
+  \item et que le hash final de la table 7 correspond au challenge.
+\end{enumerate}
+
+On commence alors par calculer $f_1$ pour les 64 x-values :
+
+\inputsourcecode{rust}{"sources/verify_1.txt"}{Calcule de $f_1$ pour les 64 x-values de la preuve}
+
+\newpage
+
+Ensuite il faut recalculer les hashs et les \emph{collations} de chaque table et vérifier les matchs :
+
+\inputsourcecode{rust}{"sources/verify_2.txt"}{Calcule de $f_1$ pour les 64 x-values de la preuve}
+
+Le code ci-dessus parcours les table de la 2 à la 7 puis chaque hash 2 par 2. Si les hashs match, on calcul le hash des \emph{collations}. A la fin des 7 tables, le tableau \verb|fx_values| ne contiendra plus qu'un élément, le hash final de la table 7 qui doit être encore comparé au challenge pour finaliser la validation de la preuve. 
 
 \section{Résultats}
 
