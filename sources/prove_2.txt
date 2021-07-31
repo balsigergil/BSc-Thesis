@@ -10,6 +10,7 @@ for table7_entry in potential_proof_entries {
             let offset = entry.offset;
             let entry_size = plotentry_size(i, self.k);
 
+            // Open table file
             let mut table_i = File::open(
                 self.data_path
                     .join(format!(table_final_filename_format!(), i)),
@@ -31,8 +32,6 @@ for table7_entry in potential_proof_entries {
             temp_buffer.push(left_entry);
             temp_buffer.push(right_entry);
         }
-
-        // Move the values from the temp buffer in the final buffer
         entries_buffer.clear();
         entries_buffer.append(&mut temp_buffer);
     }

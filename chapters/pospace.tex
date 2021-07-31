@@ -163,7 +163,7 @@ Pour construire la deuxième table, il nous faut collecter les valeurs de sortie
 
 \inputsourcecode{rust}{"sources/match_naive.txt"}{Fonction de matching naïve}
 
-Cette fonction illustre bien les conditions de match entre deux éléments mais n'est pas très performante car possède une complexité de $\bigO(6N^2)$ avec $N$ la taille d'un bucket \cite{chiapos}. Un bucket est un sous-ensemble d'une table. Pour savoir dans quel bucket se trouve une entrée on fait: $\mathsf{bucket\_id} = \lfloor\frac{y_i}{119 * 127}\rfloor$. La première condition de la matching function est que les bucket\_id des 2 entrées soient adjacents. C'est-à-dire que $\mathsf{bucket\_id_{yl}} + 1 = \mathsf{bucket\_id_{yr}}$. Cela permet de réduire les lectures sur le disque pour trouver les matchs car les éléments sont proches les uns des autres. C'est pour cela que les tables doivent être triées par les valeurs de sortie des fonctions de hachage. La deuxième condition est assez complexe. Elle sert à éviter des cycles entre les entrées si on représente l'ensemble sous forme de graph. Ces cycles peuvent être compressés ce qui représente une potentielle attaque car ça permettrait d'optimiser le stockage. C'est pour cela que les paramètres $B = 119$ et $C = 127$ ont ces valeurs. Les preuves mathématiques sont assez complexes et vont au-delà du périmètre de ce travail mais sont expliquées dans leur document de construction \cite{chia:construction}.
+Cette fonction illustre bien les conditions de match entre deux éléments mais n'est pas très performante car possède une complexité de $\bigO(N^2)$ avec $N$ la taille d'un bucket \cite{chiapos}. Un bucket est un sous-ensemble d'une table. Pour savoir dans quel bucket se trouve une entrée on fait: $\mathsf{bucket\_id} = \lfloor\frac{y_i}{119 * 127}\rfloor$. La première condition de la matching function est que les bucket\_id des 2 entrées soient adjacents. C'est-à-dire que $\mathsf{bucket\_id_{yl}} + 1 = \mathsf{bucket\_id_{yr}}$. Cela permet de réduire les lectures sur le disque pour trouver les matchs car les éléments sont proches les uns des autres. C'est pour cela que les tables doivent être triées par les valeurs de sortie des fonctions de hachage. La deuxième condition est assez complexe. Elle sert à éviter des cycles entre les entrées si on représente l'ensemble sous forme de graph. Ces cycles peuvent être compressés ce qui représente une potentielle attaque car ça permettrait d'optimiser le stockage. C'est pour cela que les paramètres $B = 119$ et $C = 127$ ont ces valeurs. Les preuves mathématiques sont assez complexes et vont au-delà du périmètre de ce travail mais sont expliquées dans leur document de construction \cite{chia:construction}.
 
 Ensuite, pour chaque couple $(y_1=f_1(x_1), y_2=f_1(x_2))$ tel que $\textsf{M}(y_1, y_2) = \textsf{Vrai}$, on calcule la fonction $f_2$ sur les \emph{x-values}:
 \begin{equation*}
@@ -184,7 +184,7 @@ Maintenant, pour chaque match trouvé il faut calculer $f_2(x_1,x_2)$ :
 
 On peut remarquer que la fonction \verb|calculate_fn| prend en fait 3 entrées: $f_1(x_1)$ (\verb|left_entry.fx|), $x_1$ (\verb|left_entry.metadata|) et $x_2$ (\verb|right_entry.metadata|). En plus de hacher $x_1$ et $x_2$, elle va aussi hacher $f_1(x_1)$. Cela permet de s'assurer que les tables se font bien l'une après l'autre et qu'on ne saute pas de table. Ainsi on ne peut pas commencer par la table 7 et essayer de trouver des matchs, les preuves résultantes seraient refusées par le réseau qui applique le bon algorithme.
 
-La fonction $f_2$, en plus de retourner le hash, va également retourner une version concaténée des entrées ($x_1\|x_2$) que l'on va stocker avec la sortie, la position et l'offset. Cela sera utile pour pouvoir calculer les tables suivantes. Cette concaténation également effectuée par la fonction \verb|calculate_fn| n'est simplement une concaténation car cela donnerait des données en sortie trop grande au moment de le faire sur les dernières table et limiter le nombre de bits en sortie de la concaténation permet d'obliger un attaquant souhaitant faire une attaque de Hellman à stocker des bits supplémentaires ou faire plus de recherche sur le disque \cite{chia:construction}. C'est pourquoi la \emph{collation} est tronkée à $x \times k$ bits avec $x$ qui change en fonction de la table qu'on est en train de calculer. La valeur de $x$ permet d'assurer que le compromis temps-mémoire est plus coûteux qu'en calculant de manière honnête \cite{chia:construction}. Cette \emph{collation} est stockée dans les metadatas de l'entrée pour permettre un calcul facile pour les tables suivante car ces metadatas seront utilisées comme entrée dans \verb|calculate_fn| lors du calcul de la prochaine table.
+La fonction $f_2$, en plus de retourner le hash, va également retourner une version concaténée des entrées ($x_1\|x_2$) que l'on va stocker avec la sortie, la position et l'offset. Cela sera utile pour pouvoir calculer les tables suivantes. Cette concaténation également effectuée par la fonction \verb|calculate_fn| n'est simplement une concaténation car cela donnerait des données en sortie trop grande au moment de le faire sur les dernières table et limiter le nombre de bits en sortie de la concaténation permet d'obliger un attaquant souhaitant faire une attaque de Hellman à stocker des bits supplémentaires ou faire plus de recherche sur le disque \cite{chia:construction}. C'est pourquoi la \emph{collation} est tronquée à $x \times k$ bits avec $x$ qui change en fonction de la table qu'on est en train de calculer. La valeur de $x$ permet d'assurer que le compromis temps-mémoire est plus coûteux qu'en calculant de manière honnête \cite{chia:construction}. Cette \emph{collation} est stockée dans les metadatas de l'entrée pour permettre un calcul facile pour les tables suivante car ces metadatas seront utilisées comme entrée dans \verb|calculate_fn| lors du calcul de la prochaine table.
 
 Voici ci-dessous le code de la fonction \verb|calculate_fn| :
 
@@ -198,7 +198,7 @@ Il faut encore trier les entrées de la table 2 par $f_2$ et la génération de 
 
 Il reste plus que 5 tables, mais heureusement le calcul est identique à la table 2. Il suffit de lire la table 2, trouver les matchs, calculer $f_3$ avec la même méthode (\verb|calculate_fn|) et stocker les valeurs dans la table 3. Et ainsi de suite jusqu'à la table 7.
 
-Pour mieux visualiser, voici un tableau récapitulatif, tiré de \cite{chia:construction}, de ce que devrait contenir chaque table après cette première phase :
+Pour mieux visualiser, voici un tableau récapitulatif, tiré de \cite{chia:construction} et modifié, de ce que devrait contenir chaque table après cette première phase :
 
 \begin{table}[H]
   \centering
@@ -269,17 +269,151 @@ Le code ci-dessus parcours les table de la 2 à la 7 puis chaque hash 2 par 2. S
 
 \section{Résultats}
 
-\lipsum[1]
+Pour conclure ce chapitre sur le \emph{proof of space}, voici une présentation des résultats obtenus concernant les performances de l'implémentation.
 
-\subsection{Performances}
+L'implémentation en Rust de la phase 1 du plotting est complète et fidèle à la construction \cite{chia:construction} de Chia. Il reste cependant des améliorations possibles pour optimiser le stockage et les performances. Elles sont décrites dans la section suivante. Mais l'implémentation réalisée permet d'avoir un algorithme de \emph{proof of space} fonctionnelle qui peut générer des preuves pour un challenge et peut donc être utilisé au sein d'une blockchain.
+
+\subsection{Performances du plotting}
+
+Pour pouvoir visualiser les performances de l'algorithme, des tests de benchmark ont été réalisés avec l'outil \href{https://github.com/sharkdp/hyperfine}{Hyperfine}. On peut se demander en effet si le fait d'avoir un SSD améliore la vitesse du plotting, ce qui serait logique puisque la lecture et l'écriture est plus rapide. Plusieurs mesures ont été faite pour des $k$ différent. Pour chaque $k$, 10 mesures avec des plot seeds différentes sont prises permettant de faire une moyenne de temps :
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{rrrrr}
+    \textbf{k} & \textbf{Moyenne [s]} & \textbf{Min [s]} & \textbf{Max [s]} & \textbf{Écart min-max} \\
+    \hline
+    \hline
+    14 & 1.531 & 1.278 & 1.784 & 0.506 \\
+    \hline
+    15 & 1.678 & 1.500   & 1.845 & 0.345 \\
+    \hline
+    16 & 2.115  & 1.729  & 2.554  & 0.825 \\
+    \hline
+    17 & 3.220   & 3.078  & 3.312  & 0.234 \\
+    \hline
+    18 & 4.892  & 3.589  & 7.452  & 3.863 \\
+    \hline
+    19 & 9.374  & 8.913  & 9.995  & 1.082 \\
+    \hline
+    20 & 17.871 & 14.655 & 21.090  & 6.435 \\
+    \hline
+    21 & 37.060  & 21.936 & 52.206 & 30.27 \\
+    \hline
+    22 & 71.133 & 68.491 & 75.731 & 7.24
+  \end{tabular}
+  \caption{Mesures sur disque dur (HDD)}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{rrrrr}
+    \textbf{k} & \textbf{Moyenne [s]} & \textbf{Min [s]} & \textbf{Max [s]} & \textbf{Écart min-max} \\
+    \hline
+    \hline
+    14 & 1.540  & 1.391  & 1.805  & 0.414  \\
+    \hline
+    15 & 1.687  & 1.472  & 1.920  & 0.448  \\
+    \hline
+    16 & 2.096  & 1.664  & 2.717  & 1.053  \\
+    \hline
+    17 & 3.212  & 2.900  & 3.437  & 0.537  \\
+    \hline
+    18 & 5.405  & 3.126  & 7.930  & 4.804  \\
+    \hline
+    19 & 9.875  & 9.340  & 10.529 & 1.189  \\
+    \hline
+    20 & 19.324 & 16.185 & 21.564 & 5.379  \\
+    \hline
+    21 & 43.438 & 22.194 & 57.638 & 35.444 \\
+    \hline
+    22 & 81.425 & 78.095 & 86.407 & 8.312
+  \end{tabular}
+  \caption{Mesures sur disque SSD}
+\end{table}
+
+On peut voir sur ces deux tableaux que le temps moyen augmente de manière exponentielle. C'est tout à fait normal puisque le nombre d'entrées est en $\bigO(2^k)$. On peut également remarquer que l'écart entre le minimum et le maximum est plus élevé pour des $k$ pair et extrêmement élevé pour $k = 21$. Cela vient du faite qu'avec des $k$ pair, le nombre de match soit reste stable au alentour de 70-90\% de $2^k$ entre l'exécution de chaque table, soit descend drastiquement en direction de 0 pour finir vers 0 à la table 7. Pourquoi les nombres paire ? Malheureusement je n'ai pas de réponse mais le nombre de match tend à se stabiliser plus $k$ grandi et il n'y a plus beaucoup d'écart à partir de $k = 25$. On peut en conclure que $k \in \{18,21\}$ sont à proscrire et de manière générale il vaut mieux choisir un grand $k$ (>=25) pour obtenir un remplissage optimal des tables et avoir plus de change de trouver des preuves.
+
+Voici ci-dessous un graphique représentant le temps de plotting en fonction de $k$ :
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=13cm]{images/bench_ssd_hdd.png}
+  \includegraphics[width=14cm]{images/bench_ssd_hdd.png}
   \caption{Comparaison du plotting en fonction de $k$}
 \end{figure}
 
+On peut remarquer que plus $k$ est grand plus le temps est court avec un SSD comparé à un HDD. Cela peut s'expliquer car la quantité de données générée est exponentielle. L'écart entre HDD et SSD sera alors de plus en plus marqué et les gains de vitesse avec un SSD de plus en plus visible.
+
+\subsection{Performances de la génération de preuves}
+
+Comme pour générer une preuve il faut parcourir les entrées de la table 7, les performances changent en fonction de $k$. La meilleure manière de faire serait d'effectuer une recherche dichotomique dans la table 7 au lieu de tout parcourir. On aurait une complexité de $\bigO(log_2(2^k)) = \bigO(k)$ au lieu de $\bigO(2^k)$. C'est cependant la première option qui a été implémentée pour des raisons de temps.
+
+Un test de benchmark a aussi été réalisé pour différentes valeurs de $k$. Pour chaque $k$, 10 mesures sont prises :
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{rrrrr}
+    \textbf{k} & \textbf{Moyenne [s]} & \textbf{Min [s]} & \textbf{Max [s]} \\
+    \hline
+    \hline
+    17 & 0.444 & 0.436 & 0.452 \\
+    \hline
+    19 & 0.499 & 0.484 & 0.518 \\
+    \hline
+    20 & 0.660 & 0.638 & 0.678 \\
+    \hline
+    22 & 0.888 & 0.865 & 0.909 \\
+    \hline
+    23 & 1.361  & 1.325  & 1.400    \\
+    \hline
+    24 & 1.845  & 1.797  & 1.888  \\
+    \hline
+    25 & 5.024  & 4.923  & 5.118  \\
+    \hline
+    26 & 8.943  & 8.731  & 9.192 
+  \end{tabular}
+  \caption{Temps pour récupérer les 64 x-values pour \textbf{une} preuve}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=12cm]{images/bench_proving.png}
+  \caption{Comparaison du proving en fonction de $k$}
+\end{figure}
+
+\subsection{Performances de la vérification de preuves}
+
+Concernant la vérification des preuves, elle peut être faite en mémoire entièrement sans avoir besoin de lire ou d'écrire sur le disque ce qui permet de rendre le calcul très rapide. Comme on calcul finalement 64 fois $f_1$ puis 32 fois $f_2$, etc\dots, jusqu'à une fois $f_7$. Le calcul ne dépend pas de $k$. La complexité de la vérification est donc en temps constant $\bigO(1)$.
+
+Voici ci-dessous un test de benchmark avec 200 échantillons par valeur de $k$ :
+
+\begin{table}[H]
+  \centering
+  \begin{tabular}{rrrrr}
+    \textbf{k} & \textbf{Moyenne [ms]} & \textbf{Min [ms]} & \textbf{Max [ms]} \\
+    \hline
+    \hline
+    17 & 80.9 & 78.2 & 95.1 \\
+    \hline
+    19 & 80.8 & 77.4 & 90.7 \\
+    \hline
+    20 & 80.8 & 78.3 & 91.1 \\
+    \hline
+    22 & 78.5 & 76.4 & 87.1 \\
+    \hline
+    23 & 78.2 & 74.3 & 87.4 \\
+    \hline
+    24 & 78.3 & 75.9 & 86.0 \\
+    \hline
+    25 & 78.4 & 75.1 & 86.5
+  \end{tabular}
+  \caption{Temps de vérification d'une preuve}
+\end{table}
+
+On remarque très clairement que c'est en temps constant voir même très légèrement plus lent avec des petits $k$. Cette variation est difficilement explicable mais probablement lié au matériel et pas très significative. 
+
 \subsection{Comparaison du calcul des matchs}
+
+On a vu qu'il y avait deux manières de trouver les matchs: une version << naïve >> et une optimisée. Voici ci-dessous un graphique montrant le temps qu'il faut pour trouver tous les matchs d'une table de $2^k$ éléments :
 
 \begin{figure}[H]
   \centering
@@ -287,10 +421,20 @@ Le code ci-dessus parcours les table de la 2 à la 7 puis chaque hash 2 par 2. S
   \caption{Comparaison des fonctions de matching en fonction de $k$}
 \end{figure}
 
+Sans surprise, c'est la version optimisée qui est plus rapide dû à sa meilleures complexité. La version optimisée à une complexité de $\bigO(N)$ contre $\bigO(N^2)$ pour la version naïve avec $N$ la taille d'un bucket. Les deux montrent quand même un courbe exponentielle sur le graphique car la nombre de buckets $N$ croit de manière exponentielle avec $k$.
+
 \subsection{Tests unitaires et d'intégration}
+
+L'ensemble de la construction est testée avec des tests unitaires mais également avec des tests d'intégration. Les tests unitaires en Rust se situent la majeur partie du temps au bas du fichier source contenant la fonction alors que les tests d'intégration se trouve dans un dossier << tests >> séparé. 
+
+De plus, le service d'intégration continue de GitHub est utilisé pour exécuter les tests à chaque push afin de s'assurer du bon fonctionnement durant le développement. 
 
 \subsection{Comparaison avec Chia}
 
 \section{Améliorations possibles}
 
-\lipsum[1]
+La construction actuelle fonctionne bien et nous permet de trouver des preuves pour un challenge à partir d'un plot. Cependant, une seule phase pour générer le plot ne suffit pas à obtenir un plot optimisé pour le stockage. Dans la construction de Chia, il y a encore 3 phases supplémentaires réalisée après. Elles permettent de supprimer les données inutiles comme les sorties des fonctions (hashs et collations) pour ne garder que la position et l'offset. Ce qui implique de modifier toutes les positions pour prendre en compte les entrées supprimées. Les phases suivantes permettent aussi de compresser les données en optimisant le stockage de la position et de l'offset.
+
+Pour des raison des temps, elles n'ont pas pu être implémentées durant ce travail.
+
+Le calcul de la qualité de la preuve est également quelque chose qui reste à faire. Elle permet de sélectionner la preuve qui aura le plus de chance d'être choisir par le réseau si on trouve plusieurs preuve pour un challenge.
