@@ -140,44 +140,41 @@ Tous ces protocoles permettent d'une manière ou d'une autre de sécuriser la bl
     \item \textbf{Byzantine Fault Tolerance}: cette famille de protocole englobe tous les algorithmes de consensus vu ci-dessus, ce n'est pas un protocole à proprement dit. On utilise un ou plusieurs protocoles vu précédemment pour avoir de la \textit{Byzantine Fault Tolerance} au sein d'un réseau d'ordinateurs distribués. Cela pour éviter principalement les attaques de Sybil.
 \end{itemize}
 
-% TODO: Attaque sur les blockchains
 \section{Attaques sur les blockchains}
+
+Les blockchains sont vulnérables à différents types d'attaque. Cela dépend du protocole utilisé, mais certaines attaques s'applique à beaucoup d'entre elles. Voici un description des attaques les plus connues sur les blockchains.
 
 \subsection{Attaque Sybil}
 
-\lipsum[1]
+\emph{L'attaque de Sybil} est sans doute la plus connue et la plus facile à comprendre. Il s'agit d'un attaquant qui se << multiplie >> pour pouvoir contrôler le réseau pair-à-pair. Par exemple, s'il n'y a pas de proof of work et que les utilisateurs font simplement confiance aux blocs qu'ils reçoivent d'autres utilisateurs, un attaquant peut créer plein de faux utilisateurs diffusant de faux blocs. Tellement de faux utilisateurs que les personnes honnêtes finiront par faire confiance aux faux blocs car ils les verront plus souvent.
+
+Pour prévenir cette attaque, il faut empêcher les utilisateurs de créer de fausses identités ou le rendre difficile au point qu'il n'y ai plus d'intérêt à en faire. Pour ce faire, Bitcoin utilise la puissance des ordinateurs car les nœuds souhaitant diffuser un bloc doivent travailler obligatoirement. Un attaquant peut toujours créer un deuxième nœud frauduleux mais cela impliquera de diviser sa puissance de calcul et n'a donc plus d'intérêt à le faire. Son seul moyen d'attaquer serait d'avoir plus de la moitié de la puissance de calcul pour que les autres utilisateurs fassent confiance aux blocs frauduleux, c'est l'attaque des 51\%.
 
 \subsection{Attaque des 51\%}
 
-\lipsum[1]
+\emph{L'attaque des 51\%} est également très connue et plutôt simple à comprendre. C'est la suite de l'attaque de Sybil mais appliquée aux ressources utilisées par une blockchain pour atteindre le consensus. Par exemple avec le Bitcoin, un attaquant doit posséder plus de 50\% de la puissance de calcul de l'ensemble du réseau pour espérer émettre une chaîne qui grandira plus rapidement que la chaîne honnête.
+
+Avec le proof of stake, c'est pareil mais cette fois-ci avec l'argent misé sur le réseau par les utilisateurs. C'est-à-dire qu'un attaquant doit posséder plus de la moitié de l'argent total misé pour contrefaire la blockchain. Sur un cryptomonnaie avec beaucoup de monnaie en circulation comme Ethereum c'est très difficile.
+
+Concernant le proof of space, c'est aussi la même chose mais l'espace de stockage alloué. Cependant, à cause des \emph{double dipping attacks} décrites dans la section \ref{pospace:security}, c'est 61.5\% du stockage qui doit être contrôlé par des nœuds honnêtes pour garantir la sécurité de la chaîne. Les explications mathématiques sous-jacentes sont décrites dans leur green paper \cite{chia:greenpaper}.
 
 \subsection{Problème du "Nothing-to-stake"}
 
-\lipsum[1]
+Le \emph{problème du << nothing-to-stake >>} est un problème lié spécifiquement aux blockchains utilisant du proof of stake. Il vient du fait que les utilisateurs qui mise de l'argent pour sécuriser le réseau peuvent aussi essayer de miser sur des branches qui ne sont les branches autorisée, des chaînes frauduleuses par exemple. Et cela peut à terme permettre des actes de double dépense.
 
-\section{Mécanismes de sécurisation}
+Pour éviter cela, les blockchains pénalisent les utilisateurs malhonnêtes en leur faisant perdre l'argent misé ou bien rétribue les nœuds honnêtes pour inciter les utilisateurs à agir dans les règles.
+
+\section{Confidentialité au sein des blockchains}
 
 La technologie de la blockchain apporté par Bitcoin est révolutionnaire. Pouvoir faire des paiements sans passer par un organisme centrale est génial mais le problème pour réaliser cela est qu'il faut conserver publiquement un registre de toutes les transactions. Les entrées et sorties des transactions sont identifiées par des adresses dérivées des clés publiques des utilisateurs. Les transactions sont ainsi pseudonymes. Satoshi Nakamoto l'a dit dans son whitepaper: \textit{The public can see that someone is sending an amount to someone else, but without information linking the transaction to anyone.}
 
 Mais les transaction ne sont pas anonymes. On peut quand même voir le montant, de qui et vers qui va l'argent même si on ne sais pas forcément qui sont derrières les adresses. Il faut bien faire la distinction entre \emph{anonyme} et \emph{pseudonyme}.
 
-Cependant, il existe des blockchains qui permettent d'anonymiser leurs transactions. Rendant illisible le montant et les adresses ainsi que tout autres données. Les deux cryptomonnaies les plus connue à ce sujet sont présentées ci-dessous. 
+Cependant, il existe des blockchains qui permettent d'anonymiser leurs transactions comme \emph{Zcash} ou \emph{Monero}, rendant illisible le montant et les adresses ainsi que tout autres données.
 
-% TODO: Écrire Zcash
-\subsection{Zcash}
-
-\lipsum[1]
-
-% TODO: Écrire Monero
-\subsection{Monero}
-
-\lipsum[1]
-
-\section{Cryptomonnaies de 3ème génération}
+\section{Performance des blockchains}
 
 On peut qualifier le Bitcoin de 1ère génération de cryptomonnaie. Il y a eu ensuite Ethereum et l'apparition des smart-contracts considéré comme cryptomonnaie de 2ème génération. Et maintenant il y a les cryptomonnaies de 3ème génération qui tentent de résoudre les problèmes présents avec le Bicoin et Ethereum. Notamment les soucis de performance et de stockage.
-
-\subsection{Performance des blockchains}
 
 Un point important est la performance des blockchains. Or le Bitcoin ne peut traiter que 4 à 5 transactions par seconde ce qui le rend très peu performant comparé au réseau VISA qui traite environ 2000 transactions par seconde en moyenne et peu monter plus haut en cas de forte affluence. Le problème vient du fait qu'il faut 10 minutes pour générer un bloc et que chaque bloc fait au maximum 1 mégaoctet. Ces informations sont codées en dur dans le code source de Bitcoin ce qui veut dire qu'il est possible de les modifier pour améliorer les performances du réseau Bitcoin. Mais alors pourquoi les développeurs ne l'ont pas fait ? 
 
@@ -185,19 +182,4 @@ Il y a deux possibilités: 1. réduire le temps de génération d'un bloc et 2. 
 
 La première possibilité est compliquée à mettre en place car la propagation d'un nouveau bloc à travers le réseau prend du temps. Réduire le temps de création implique de réduire la difficulté de la preuve de travail ce qui fera que plus de mineurs généreront plus de blocs rendant le consensus plus compliqué à cause du nombre de mineurs présent sur le réseau et d'un propagation lente.
 
-La deuxième possibilité à fait de grands débats au sein de la communauté. C'est facile d'augmenter la taille des blocs mais cela implique que la blockchain prendra plus d'espace de stockage à l'avenir. Certains développeurs étaient pour une augmentation et d'autres non ce qui est venu à créer \emph{Bitcoin Cash}, un "hard fork" de Bitcoin. Les développeurs de Bitcoin Cash ont décidé d'augmenter la taille maximum des blocs. Ils ont choisi un bloc dans la blockchain Bitcoin et ont créé une nouvelles branches à partir depuis laquelle les nouveaux blocs de Bitcoin Cash seront créés. Par ailleurs, si vous aviez des Bitcoins avant la séparation vous avez du coup le même montant en Bitcoin Cash (BCH) mais aussi en Bitcoin. Comme les deux branches sont séparées l'une de l'autre, c'est comme si les coins s'étaient dupliqués.
-
-\subsection{Cardano}
-
-% TODO: Écrire Cardano
-\lipsum[1]
-
-\subsection{IOTA}
-
-% TODO: Écrire IOTA
-\lipsum[1]
-
-\subsection{Solana}
-
-% TODO: Écrire Solana
-\lipsum[1]
+La deuxième possibilité a fait de grands débats au sein de la communauté. C'est facile d'augmenter la taille des blocs mais cela implique que la blockchain prendra plus d'espace de stockage à l'avenir. Certains développeurs étaient pour une augmentation et d'autres non ce qui est venu à créer \emph{Bitcoin Cash}, un "hard fork" de Bitcoin. Les développeurs de Bitcoin Cash ont décidé d'augmenter la taille maximum des blocs. Ils ont choisi un bloc dans la blockchain Bitcoin et ont créé une nouvelles branches à partir depuis laquelle les nouveaux blocs de Bitcoin Cash seront créés. Par ailleurs, si vous aviez des Bitcoins avant la séparation vous avez du coup le même montant en Bitcoin Cash (BCH) mais aussi en Bitcoin. Comme les deux branches sont séparées l'une de l'autre, c'est comme si les coins s'étaient dupliqués mais restent tous deux valides.

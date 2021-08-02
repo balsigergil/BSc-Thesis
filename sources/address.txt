@@ -1,0 +1,13 @@
+impl<T: PublicKey> From<T> for Address {
+    fn from(key: T) -> Self {
+        let address_bytes = key.as_bytes();
+        let address_payload = &address_bytes[(address_bytes.len() - 16)..];
+        let mut payload = Vec::new();
+        payload.extend_from_slice(VERSION); // 2 bytes
+        payload.extend_from_slice(address_payload); // 16 bytes
+        let checksum = &Hash::hash(&payload).to_vec()[..4];
+        payload.extend_from_slice(checksum); // 4 bytes
+
+        Address(<[u8; Address::ADDRESS_LENGTH]>::try_from(payload).unwrap())
+    }
+}

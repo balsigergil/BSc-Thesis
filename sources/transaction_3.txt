@@ -1,0 +1,6 @@
+pub struct TransactionPayload {
+    pub timestamp: i64,
+    pub to_address: Address,
+    pub amount: u64,
+    pub fee: u64,
+}

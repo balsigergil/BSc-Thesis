@@ -1,0 +1,13 @@
+pub fn finalize<T: Keypair>(self, keypair: &T) -> Result<Transaction<T>> {
+        let signature = keypair
+            .sign(self.as_bytes(), Some(CONTEXT))
+            .or(Err(TransactionError::TxSignatureError))?;
+
+        Ok(Transaction {
+            signature: Some(TransactionSignature {
+                pubkey: keypair.public_key(),
+                signature,
+            }),
+            payload: self,
+        })
+    }

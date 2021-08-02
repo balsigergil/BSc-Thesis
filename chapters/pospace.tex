@@ -111,6 +111,7 @@ Avec la fonction $\mathsf{M}(y_1,y_2)$ qui retourne \texttt{vrai} si et seulemen
 Le vérificateur regarde ensuite si la valeur calculée correspond avec le challenge initial.
 
 \section{Sécurité et attaques}
+\label{pospace:security}
 
 Comme vu dans le chapitre sur les protocoles de consensus, \emph{proof of space} a des avantages écologiques puisque le calcul n'est réalisé qu'une fois au début lors de la génération du plot. Cela signifie que la génération de preuves ne requiert que très peu de puissance calcul et que par conséquent elle peut être exécutée rapidement à la différence de proof of work. Cela implique qu'un attaquant peut forger des blocs en avance, générer leur preuve respective et les broadcaster sur le réseau. Si ces blocs sont valides ils pourraient être acceptés par le réseau qui se base automatiquement sur la plus longue chaîne de blocs. Il y aurait du coup la possibilité pour des attaquant d'effectuer des actes de double dépenses. C'est ce que Chia appelle les \emph{Grinding attacks}.
 
@@ -301,7 +302,7 @@ Pour pouvoir visualiser les performances de l'algorithme, des tests de benchmark
     \hline
     22 & 71.133 & 68.491 & 75.731 & 7.24
   \end{tabular}
-  \caption{Mesures sur disque dur (HDD)}
+  \caption{Mesures sur disque SSD}
 \end{table}
 
 \begin{table}[H]
@@ -328,7 +329,7 @@ Pour pouvoir visualiser les performances de l'algorithme, des tests de benchmark
     \hline
     22 & 81.425 & 78.095 & 86.407 & 8.312
   \end{tabular}
-  \caption{Mesures sur disque SSD}
+  \caption{Mesures sur disque dur (HDD)}
 \end{table}
 
 On peut voir sur ces deux tableaux que le temps moyen augmente de manière exponentielle. C'est tout à fait normal puisque le nombre d'entrées est en $\bigO(2^k)$. On peut également remarquer que l'écart entre le minimum et le maximum est plus élevé pour des $k$ pair et extrêmement élevé pour $k = 21$. Cela vient du faite qu'avec des $k$ pair, le nombre de match soit reste stable au alentour de 70-90\% de $2^k$ entre l'exécution de chaque table, soit descend drastiquement en direction de 0 pour finir vers 0 à la table 7. Pourquoi les nombres paire ? Malheureusement je n'ai pas de réponse mais le nombre de match tend à se stabiliser plus $k$ grandi et il n'y a plus beaucoup d'écart à partir de $k = 25$. On peut en conclure que $k \in \{18,21\}$ sont à proscrire et de manière générale il vaut mieux choisir un grand $k$ (>=25) pour obtenir un remplissage optimal des tables et avoir plus de change de trouver des preuves.

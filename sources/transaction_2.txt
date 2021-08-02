@@ -1,0 +1,4 @@
+pub struct TransactionSignature<T: PublicKey> {
+    pub pubkey: T,
+    pub signature: T::SignatureType,
+}
