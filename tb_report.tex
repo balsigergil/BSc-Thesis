@@ -38,7 +38,13 @@
 % TODO Résumé publiable
 
 \newcommand{\TBresumePubliable}{
-Dans ce travail... Ceci est le résumé publiable...
+  Le Bitcoin est l'une des cryptomonnaies les plus connues et utilisées aujourd'hui en 2021. Cependant, elle n'est pas parfaite et certains points sur sa conception et son fonctionnement posent problèmes, notamment vis-à-vis de l’écologie, où le Bitcoin est très critiqué pour sa consommation d’énergie électrique. En effet, les mineurs de Bitcoin doivent allouer une grande quantité de puissance de calcul pour sécuriser la blockchain.
+
+  Dans une première partie, une étude des protocoles de consensus a été réalisée dans le but de trouver un algorithme avec une plus faible empreinte environnemental que le Bitcoin.
+
+  Dans une seconde partie, un des protocoles de consensus analysés a été choisi pour être implémenté en Rust. Une blockchain a également été développée en Rust afin de mettre en application le protocole.
+  
+  Le résultat final est une implémentation de l’algorithme proof of space basé sur l’inversion de fonctions de hachage, ainsi qu’une blockchain permettant de démontrer une utilisation concrète du protocole de consensus. Plusieurs analyses de performance ont été réalisées sur l’implémentation du proof of space. Quant à la blockchain, elle est fonctionnelle et permet de créer des transactions, les ajouter dans un bloc, prouver le bloc avec du proof of space et intégrer ce bloc à la blockchain localement.  
 }
 
 % +---------------------------------------------------------------+
@@ -83,9 +89,8 @@ Dans ce travail... Ceci est le résumé publiable...
 % +---------------------------------------------------------------+
 \tableofcontents
 
-\glsaddall % TODO: remove this line
-\setglossarystyle{listhypergroup}
-\printglossary
+% \setglossarystyle{listhypergroup}
+% \printglossary
 
 
 % Content
