@@ -1,8 +1,9 @@
 pub struct Block<T: Proof> {
     pub height: u64,
+    pub timestamp: i64,
     pub hash: Vec<u8>,
     pub previous_block_hash: Option<Vec<u8>>,
     pub transactions: Vec<Tx>,
     pub merkle_root: Option<Vec<u8>>,
-    pub proof: Option<T>,
+    pub proof: Option<Proof>,
 }

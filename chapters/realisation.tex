@@ -3,22 +3,19 @@
 
 \section{Introduction}
 
-Dans ce chapitre est présenté l'implémentation de la blockchain. Il explique les choix d'implémentation et montre comment la blockchain fonctionne. L'implémentation actuelle de la blockchain se limite à une utilisation locale hors-ligne. Comme pour la partie proof of space, la blockchain est implémentée en Rust et certaine partie du code source seront présentées.
+Dans ce chapitre est présenté l'implémentation de la blockchain. Il explique les choix d'implémentation et montre comment la blockchain fonctionne. L'implémentation actuelle de la blockchain se limite à une utilisation locale hors-ligne. Comme pour la partie proof of space, la blockchain est implémentée en Rust et certaines parties du code source seront présentées.
 
-Le code sources est un workspace cargo contenant plusieurs crates. Une crates est un projet Rust. Le but est de diviser le code pour mieux régner.
+Le code sources est un workspace cargo contenant plusieurs crates. Une crate est un projet Rust. Le but est de diviser le code pour mieux régner.
 
-Les crates sont les suivantes :
+Les crates importantes sont les suivantes :
 
 \begin{itemize}
-  \item \textbf{consensus}
-  \item \textbf{crypto}
-  \item \textbf{grpc}
-  \item \textbf{ledger}
-  \item \textbf{merkletree}
-  \item \textbf{node}
-  \item \textbf{pospace}
-  \item \textbf{powork}
-  \item \textbf{storage}
+  \item \textbf{crypto}: traits et structures liés à la cryptographie
+  \item \textbf{ledger}: crate gérant le registre, les blocs et les transactions
+  \item \textbf{merkletree}: algorithme pour l'arbre de Merkle
+  \item \textbf{node}: client en ligne de commandes
+  \item \textbf{pospace}: implémentation du proof of space
+  \item \textbf{storage}: crate gérant le stockage des informations
 \end{itemize}
 
 \section{Cryptographie}
@@ -33,7 +30,7 @@ Un deuxième point concernant le crypto est les fonctions de hachages. Dans l'al
 
 \section{Transactions}
 
-L'objectif est de réaliser un système de paiement décentralisé. Les transactions sont alors un éléments nécessaire à la blockchain. Ces signature doivent pouvoir être signée, ce qui sera expliqué dans la section \ref{sec:signature}. Pour simplifier par rapport à d'autres blockchains existantes, les transactions contiendront juste un timestamp, une adresse de destination, le montant de la transaction, des frais de transaction et une signature. Le tout en différentes structures Rust :
+L'objectif est de réaliser un système de paiement décentralisé. Les transactions sont alors un élément nécessaire à la blockchain. Ces signatures doivent pouvoir être signées, ce qui sera expliqué dans la section \ref{sec:signature}. Pour simplifier par rapport à d'autres blockchains existantes, les transactions contiendront juste un timestamp, une adresse de destination, le montant de la transaction, des frais de transaction et une signature. Le tout en différentes structures Rust :
 
 \inputsourcecode{rust}{"sources/transaction_1.txt"}{Structure d'une transaction}
 
@@ -41,19 +38,19 @@ L'idée dernière cette séparation entre signature et payload est que c'est la 
 
 \inputsourcecode{rust}{"sources/transaction_2.txt"}{Structure d'une signature de transaction}
 
-On peut voir que le code des transactions est générique sur les types de signatures et de clés publiques. Cela permet d'utiliser ces structures avec d'autres moyen de signature que Ed25519 si besoin dans le futur.
+On peut voir que le code des transactions est générique sur les types de signatures et de clés publiques. Cela permet d'utiliser ces structures avec d'autres moyens de signature que Ed25519 si besoin dans le futur.
 
 \inputsourcecode{rust}{"sources/transaction_3.txt"}{Structure des éléments d'une transaction}
 
-Le timestamp est ici une simple indication et en aucun cas un moyen sécurisé de vérifier qu'une transaction à eu lieu avant un autre. Ceci car l'émetteur de la transaction peut tout simplement choisir la date et il est difficile de vérifier si c'est la vérité.
+Le timestamp est ici une simple indication et en aucun cas un moyen sécurisé de vérifier qu'une transaction a eu lieu avant un autre. Ceci car l'émetteur de la transaction peut tout simplement choisir la date et il est difficile de vérifier si c'est la vérité.
 
 \section{Adresses}
 
-Les \emph{adresses} sont un moyen d'identifier un compte sur la blockchain. Elle est dérivée de la clé publique ce qui veut dire qu'on peut passer d'une $pk$ à une adresse mais pas inversement. Une \emph{adresse} est un tableau de 22 octets. Pourquoi 22 octets au lieu de 32 octets, la taille d'une clé publique ? Parce que cela rend une chaîne de caractère plus petite et plus facilement utilisable. L'adresse est composé de 2 octets pour la version, 16 octets provenant de l'adresse et 4 octets pour la checksum. 16 octets permet d'avoir $2^{16 \times 8}$ adresses différentes ce qui est amplement suffisant pour utilisation dans le futur. La checksum permet d'éviter les erreurs de frappe si on saisi un adresse à la main par exemple. Elle représente les 4 premiers octets du hash de la payload.
+Les \emph{adresses} sont un moyen d'identifier un compte sur la blockchain. Elle est dérivée de la clé publique ce qui veut dire qu'on peut passer d'une $pk$ à une adresse mais pas inversement. Une \emph{adresse} est un tableau de 22 octets. Pourquoi 22 octets au lieu de 32 octets, la taille d'une clé publique ? Parce que cela rend une chaîne de caractère plus petite et plus facilement utilisable. L'adresse est composé de 2 octets pour la version, 16 octets provenant de l'adresse et 4 octets pour la checksum. 16 octets permet d'avoir $2^{16 \times 8}$ adresses différentes ce qui est amplement suffisant pour une utilisation dans le futur. La checksum permet d'éviter les erreurs de frappe si on saisi une adresse à la main par exemple. Elle représente les 4 premiers octets du hash de la payload.
 
 \inputsourcecode{rust}{"sources/address.txt"}{Création d'une adresse à partir d'une clé publique}
 
-Pour l'affichage, c'est l'encodage \emph{base58} qui est utilisé comme pour Bitcoin. Cela permet d'éviter les confusions avec des charactères qui se ressemble comme l (L minuscule) et I (i majuscule), 0 (zéro) et O (lettre o) par exemple.
+Pour l'affichage, c'est l'encodage \emph{base58} qui est utilisé comme pour le Bitcoin. Cela permet d'éviter les confusions avec des charactères qui se ressemblent comme l (L minuscule) et I (i majuscule), 0 (zéro) et O (lettre o) par exemple.
 
 \section{Merkle tree}
 
@@ -61,7 +58,7 @@ L'arbre de Merkle est un arbre binaire de hash. Un arbre dans lequel chaque nœu
 
 Cette structure est notamment utilisée pour hacher les transactions au sein d'un bloc. On stocke dans le bloc la racine de l'arbre de Merkle. Comme cela, si un utilisateur veut savoir si une transaction appartient à un bloc, il n'a pas besoin de télécharger toutes les transactions du bloc, seulement le hash du frère, de l'oncle, grand-oncle etc... jusqu'à la racine ce qui donne pour un bloc de 1000 transactions seulement $\log_2(1000) \approx 10$ hashs.
 
-Une implémentation simple a été réalisée pour ce projet sans librairie. Cependant elle ne permet pas encore de vérifier une transaction de manière optimal comme présenté ci-dessus. Cela fait partie d'une amélioration possible pour le projet.
+Une implémentation simple a été réalisée pour ce projet sans librairie. Cependant elle ne permet pas encore de vérifier une transaction de manière optimale comme présenté ci-dessus. Cela fait partie d'une amélioration possible pour le projet.
 
 \section{Signatures}
 \label{sec:signature}
@@ -78,20 +75,20 @@ Maintenant que les transactions sont signées, il faut les assembler au sein d'u
 
 \inputsourcecode{rust}{"sources/bloc_1.txt"}{Structure d'un bloc}
 
-Il possède une hauteur qui indique où est-ce qu'il se situe dans le chaîne, un hash, le hash du bloc précédent ($\mathsf{hauteur} - 1$), la liste des transactions, la racine de l'arbre de Merkle et une preuve. Pour cette implémentation, un bloc est aussi générique sur le type de preuve. On peut ainsi modifier le type de preuve facilement pour tester du proof of work par exemple.
+Il possède une hauteur qui indique où est-ce qu'il se situe dans le chaîne, un timestamp indiquant quand le bloc a été créé, utile car modifiable facilement si aucune preuve n'est trouvée pour le hash du bloc; un hash, le hash du bloc précédent ($\mathsf{hauteur} - 1$), la liste des transactions, la racine de l'arbre de Merkle et une preuve.
 
-Certains types sont optionnel car le premier bloc, le \emph{genesis} n'as pas besoin de toutes les données comme le hash du bloc précédent par exemple.
+Certains types sont optionnels car le premier bloc, le \emph{genesis} n'as pas besoin de toutes les données comme le hash du bloc précédent par exemple.
 
-Pour vérifier un bloc, on vérifie d'abord son hash puis on vérifie les transactions à l'intérieur. La validation des transactions concerne la vérification de la signature. Est-ce que le montant est valide ? Les autres vérification comme le solde d'une adresse se font au niveau du registre car au niveau d'un bloc on a aucune notion de solde encore.
+Pour vérifier un bloc, on vérifie d'abord son hash puis on vérifie les transactions à l'intérieur. La validation des transactions concerne la vérification de la signature. Les autres vérifications comme le solde d'une adresse se font au niveau du registre car au niveau d'un bloc on a aucune notion de solde encore.
 
-Le registre, c'est la blockchain. Il regroupe tous les blocs ensemble et permet de vérifier ainsi l'ensemble des transactions. On peut ajouter un bloc au registre à partir de transactions existantes, par exemple des transactions reçue à partir du réseau. Ce dernier va alors créer un nouveau bloc à la suite chaîne.
+Le registre, c'est la blockchain. Il regroupe tous les blocs ensemble et permet de vérifier ainsi l'ensemble des transactions. On peut ajouter un bloc au registre à partir de transactions existantes, par exemple des transactions reçues à partir du réseau. Ce dernier va alors créer un nouveau bloc à la suite de la chaîne.
 
 Le registre permet également de récupérer le solde d'une adresse.
 
-La sérialisation et le stockage de la blockchain se fait bloc par bloc à l'aide de la librairie Borsh.
+La sérialisation et le stockage de la blockchain se font bloc par bloc à l'aide de la librairie Borsh.
 
 \section{Tests}
 
 Comme pour le proof of space, l'entièreté du projet est testé avec des tests unitaires afin de vérifier le bon fonctionnent du registre, blocs, transactions et autres. Notamment pour tester les cas limites dans certaines situations ou bien des erreurs particulières.
 
-L'ensemble du projet gère les erreurs de manière ciblée avec les librairies \emph{thiserror} et \emph{anyhow} permettant de créer des erreurs personnalisée et de les gérée de manière intuitive. C'est-à-dire que la majeur partie des fonction retourne un \verb|Result|, ce result sera traité dans la fonction << main >> et grâce à anyhow, des contexts peuvent être ajouté pour donner plus d'indication sur une erreur.
+L'ensemble du projet gère les erreurs de manière ciblée avec les librairies \emph{thiserror} et \emph{anyhow} permettant de créer des erreurs personnalisées et de les gérer de manière intuitive. C'est-à-dire que la majeur partie des fonctions retournent un \verb|Result|, ce result sera traité dans la fonction << main >> et grâce à anyhow, des contextes peuvent être ajoutés pour donner plus d'indications sur une erreur.
