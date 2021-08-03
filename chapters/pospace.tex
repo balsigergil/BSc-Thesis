@@ -7,7 +7,7 @@ La \emph{preuve d'espace} (ou \emph{proof of space} en anglais) est un algorithm
 
 Il existe principalement deux constructions pour faire du proof of space : une basée sur \textbf{l'inversion de fonctions de hachage} \cite{DBLP:conf/asiacrypt/AbusalahACKPR17} et une basée sur des \textbf{graphs acycliques orientés} \cite{DBLP:conf/crypto/DziembowskiFKP15}.
 
-Pour ce travail, il a fallu faire un choix d'un algorithme à implémenter. Ce choix c'est porté sur l'inversion des fonctions de hachage car il y plus de ressources disponibles et la construction est plus simple à implémenter comparé aux graphs.
+Pour ce travail, il a fallu faire un choix d'un algorithme à implémenter. Ce choix s'est porté sur l'inversion des fonctions de hachage car il y plus de ressources disponibles et la construction est plus simple à implémenter comparée aux graphs.
 
 Ce chapitre explique le fonctionnement général du protocole tiré de la blockchain Chia.
 
@@ -17,7 +17,7 @@ Dans un premier temps, les données sont générées par le farmer dans une éta
 
 En suite, un farmer peut prouver qu'il a bien les données qu'il dit avoir stockées en trouvant une ou plusieurs preuves répondant à un challenge donné. C'est l'étape du \textbf{farming}.
 
-Lors de la \textbf{vérification}, le vérificateur récupère la prevue, vérifie si elle est valide et est à partir de celle-ci, recalcule le challenge et vérifie s'il correspond à celui envoyé précédemment.
+Lors de la \textbf{vérification}, le vérificateur récupère la preuve, vérifie si elle est valide et à partir de celle-ci, recalcule le challenge puis vérifie s'il correspond à celui envoyé précédemment.
 
 Proof of space est un protocole dans lequel il y a :
 
@@ -38,7 +38,7 @@ Le plotting est un procédé non-interactif durant le lequel le farmer va créer
 
 La construction de cette preuve d'espace est basée sur la construction de Chia \cite{chia:construction}, elle-même basée sur l'inversion de fonctions de hachage \cite{DBLP:conf/asiacrypt/AbusalahACKPR17}.
 
-Le principe est le suivant: le vérificateur donne une fonction $f: N \rightarrow N$ avec $N = \{0,1\}^k$ et $k$ le \textbf{space parameter}, modélisée comme un oracle aléatoire, au farmer, puis, lors de la vérification, demande au farmer l'entrée correspondant à une sortie choisie aléatoirement. Le farmer a alors besoin d'inverser rapidement la fonction. Pour ce faire, on peut imaginer que le farmer précalcule les sorties de la fonctions. Ainsi, lorsqu'un challenge est donné au farmer, il a simplement à regarder dans la table des valeurs de sortie par une recherche dichotomique (les données $(f(x), x)$ sont triées par $f(x)$) et renvoyer l'entrée associée comme avec une lookup-table. En pratique, on utilisera une \gls{hash-function}. La table serait alors donnée par $f(x) = H(n\|x)$, avec $n$ un nonce aléatoire.
+Le principe est le suivant: le vérificateur donne une fonction $f: N \rightarrow N$ avec $N = \{0,1\}^k$ et $k$ le \textbf{space parameter}, modélisée comme un oracle aléatoire, au farmer, puis, lors de la vérification, demande au farmer l'entrée correspondant à une sortie choisie aléatoirement. Le farmer a alors besoin d'inverser rapidement la fonction. Pour ce faire, on peut imaginer que le farmer précalcule les sorties de la fonctions. Ainsi, lorsqu'un challenge est donné au farmer, il a simplement à regarder dans la table des valeurs de sortie par une recherche dichotomique (les données $(f(x), x)$ sont triées par $f(x)$) et renvoyer l'entrée associée comme avec une lookup-table. En pratique, on utilisera une \gls{hash-function}. La table sera alors donnée par $f(x) = H(n\|x)$, avec $n$ un nonce aléatoire.
 
 \begin{figure}[H]
   \centering
@@ -46,9 +46,9 @@ Le principe est le suivant: le vérificateur donne une fonction $f: N \rightarro
   \caption{Table simplifiée, tiré de \cite{chia:construction}}
 \end{figure}
 
-Cependant, à cause d'un compromis temps-mémoire expliqué par \emph{Martin Hellman} en 1980, il est possible de faire une attaque avec laquelle il est possible de stocker uniquement $\sqrt{2^k}$ valeurs et de calculer uniquement $\sqrt{2^k}$ valeurs à la demande. L'attaque de Hellman part du principe que la fonction en question est facile à calculer. Chose qui n'est pas nécessaire quand on veut faire du proof of space puisque l'on veut juste pouvoir générer des preuves rapidement et les vérifier rapidement. La génération peut prendre du temps car elle ne sera faite qu'une fois. Ainsi, pour éviter un maximum ce problème, il faut rendre la fonction $N \rightarrow N$ \textbf{difficile à calculer} pour rendre l'initialisation plus longue et réduire le compromis temps-mémoire mais elle doit rester facilement inversible, ceci pour forcer les farmers à stocker l'entièreté de la table.
+Cependant, à cause d'un compromis temps-mémoire expliqué par \emph{Martin Hellman} en 1980 \cite{DBLP:journals/tit/Hellman80}, il est possible de faire une attaque avec laquelle il est possible de stocker uniquement $\sqrt{2^k}$ valeurs et de calculer uniquement $\sqrt{2^k}$ valeurs à la demande. L'attaque de Hellman part du principe que la fonction en question est facile à calculer. Chose qui n'est pas nécessaire quand on veut faire du proof of space puisque l'on veut juste pouvoir générer des preuves rapidement et les vérifier rapidement. La génération peut prendre du temps car elle ne sera faite qu'une fois. Ainsi, pour éviter au maximum ce problème, il faut rendre la fonction $N \rightarrow N$ \textbf{difficile à calculer} pour rendre l'initialisation plus longue et réduire le compromis temps-mémoire mais elle doit rester facilement inversible, ceci pour forcer les farmers à stocker l'entièreté de la table.
 
-Pour la rendre plus difficile à calculer, on peut modéliser une nouvelle fonction $f(x_1)=f_2(x_1,x_2)$, où $f_2(x_1,x_2)=H(x_1\|x_2)$ avec \textbf{la condition} que $f_1(x_1)=f_1(x_2)+1$, avec $f_1$ également une fonction de hachage. Ainsi, à partir d'un challenge $z$, le farmer doit trouver les valeurs $x_1$ et $x_2$. Et comme la fonction $f$ n'est pas facilement calculable, le farmer doit stocker toutes les tables pour pouvoir répondre rapidement. Cette construction, illustrée ci-dessous, est toujours vulnérable aux attaques de Hellman mais plus ajoute de fonctions (donc de tables), plus on rend la génération des tables lente diminuant le compromis temps-mémoire. Chia utilise 7 tables.
+Pour la rendre plus difficile à calculer, on peut modéliser une nouvelle fonction $f(x_1)=f_2(x_1,x_2)$, où $f_2(x_1,x_2)=H(x_1\|x_2)$ avec \textbf{la condition} que $f_1(x_1)=f_1(x_2)+1$, avec $f_1$ également une fonction de hachage. Ainsi, à partir d'un challenge $z$, le farmer doit trouver les valeurs $x_1$ et $x_2$. Et comme la fonction $f$ n'est pas facilement calculable, le farmer doit stocker toutes les tables pour pouvoir répondre rapidement. Cette construction, illustrée ci-dessous, est toujours vulnérable aux attaques de Hellman mais plus on ajoute de fonctions (donc de tables), plus on rend la génération des tables lente diminuant le compromis temps-mémoire. Chia utilise 7 tables.
 
 \begin{figure}[H]
   \centering
@@ -64,7 +64,7 @@ Une fois les tables générées, on peut commencer à faire du \textbf{farming}.
 
 \subsection{Farming}
 
-Le \emph{farming} est le processus dans lequel le farmer reçoit un challenge et produit une preuve composé de 64 nombres entiers pour démontrer qu'il a bien alloué l'espace indiqué. Le challenge est une valeur de 256 bits (un hash par exemple). Pour ce faire, le farmer parcours la dernière table de son plot pour voir s'il trouve une entrée correspondant au challenge tel que $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(\mathrm{table_4}[i])$, pour $i \in \{0,1,\dots,2^k-1\}$. S'il trouve une correspondance, le farmer parcours les tables dans le sens inverse, pour retrouver les x-values. Il renvoie ensuite les 64 valeurs au vérificateur.
+Le \emph{farming} est le processus dans lequel le farmer reçoit un challenge et produit une preuve composés de 64 nombres entiers pour démontrer qu'il a bien alloué l'espace indiqué. Le challenge est une valeur de 256 bits (un hash par exemple). Pour ce faire, le farmer parcours la dernière table de son plot pour voir s'il trouve une entrée correspondant au challenge tel que $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(\mathrm{table_4}[i])$, pour $i \in \{0,1,\dots,2^k-1\}$. S'il trouve une correspondance, le farmer parcours les tables dans le sens inverse, pour retrouver les x-values. Il renvoie ensuite les 64 valeurs au vérificateur.
 
 Une preuve $\pi$ possède le format suivant avec la construction de Chia \cite{chia:construction} comportant 7 tables :
 
@@ -86,7 +86,7 @@ Dans le cas d'une blockchain, le système est non-interactif. La preuve doit pou
 
 \subsection{Vérification}
 
-La vérification consiste à valider une preuve donnée par un farmer. Elle est simple puisqu'il suffit de recalculer à partir ces 64 x-values et de la clé publique du farmer les valeurs des hashs, vérifier qu'ils matchent entre eux et que le dernier hash correspond au challenge.
+La vérification consiste à valider une preuve donnée par un farmer. Elle est simple puisqu'il suffit de recalculer à partir de ces 64 x-values et de la clé publique du farmer les valeurs des hashs, vérifier qu'ils matchent entre eux et que le dernier hash correspond au challenge.
 
 Voici un exemple avec 4 tables et 8 \emph{x-values}. La validateur va executer les fonctions de la manière suivante :
 
@@ -121,10 +121,10 @@ Il y a plusieurs types de grinding attacks présentées dans leur \emph{Chia Gre
   \item \textbf{Digging attacks}: Si on reprend l'exemple de proof of work, un mineur sélectionne un certain nombre de transactions à inclure dans le prochain bloc pour ensuite essayer de trouver la preuve de travail correspondante. Cependant, rien ne l'empêche techniquement de calculer plusieurs challenges à la fois en prenant par exemple des transactions différentes pour maximiser ses chances de trouver une preuve. Mais cela implique que le mineur doit diviser sa puissance de calcul, ce qui ne sert donc pas à grand chose car il n'aura aucun avantage à le faire.
   
   Mais avec \emph{proof of space} ce n'est pas la même situation. Comme les preuves peuvent être générée pour un challenge sans puissance de calcul particulière, un farmer peut tenter de trouver un maximum de preuves pour plusieurs challenges et garder seulement la preuve qui a le plus de chance d'être acceptée par le réseau. Ce qui leur permettrait de gagner face à des farmers honnêtes.
-  \item \textbf{Double dipping attacks}: Ici, le farmer attaquant va essayer de trouver des preuves pour plusieurs blocs différents à la fois. Normalement, le mineur/farmer doit, selon le protocole, tenter d'étendre uniquement la chaîne la plus longue. Avec proof of work, les \emph{double dipping attacks} n'existent pas pour les mêmes raison qu'il n'y a pas de \emph{digging attacks}. Mais, à nouveau, comme on peut générer des preuves efficacement avec PoSpace, il est possible n'étendre autant de branches ce le souhaite le farmer. Ce qui pose un problème pour atteindre le consensus sur quelle chaîne est la bonne si tout le monde fait ça. 
+  \item \textbf{Double dipping attacks}: Ici, le farmer attaquant va essayer de trouver des preuves pour plusieurs blocs différents à la fois. Normalement, le mineur/farmer doit, selon le protocole, tenter d'étendre uniquement la chaîne la plus longue. Avec proof of work, les \emph{double dipping attacks} n'existent pas pour les mêmes raisons qu'il n'y a pas de \emph{digging attacks}. Mais, à nouveau, comme on peut générer des preuves efficacement avec PoSpace, il est possible n'étendre autant de branches ce le souhaite le farmer. Ce qui pose un problème pour atteindre un consensus si tout le monde fait ça. 
 \end{itemize}
 
-Pour palier aux \emph{digging attacks}, la blockchain Chia associe les preuves d'espace à des \emph{preuves de temps} (proofs of time) basées sur des \emph{Verifiable Delay Functions} afin de vérifier qu'un certain temps c'est réellement écoulé. Ces fonctions particulières prennent un temps réel à s'exécuter et ne peuvent pas être parallélisées. Par contre la vérification de la preuve de temps est elle réalisable rapidement. Techniquement, la blockchain utilise des exponentiations répétées sur des groupes d'ordre inconnus \cite{DBLP:conf/crypto/BonehBBF18} \cite{DBLP:conf/innovations/Pietrzak19a} \cite{DBLP:conf/eurocrypt/Wesolowski19}. Ces deux systèmes de preuves sont utilisés de manière à éviter les grinding attacks en séparant la blockchain en deux chaînes parallèles. Une chaîne appelée << trunk >> dite \emph{ungrindable} contenant uniquement les preuves d'espace et de temps et une chaîne appelée << foliage >> contenant les données des transactions.
+Pour pallier aux \emph{digging attacks}, la blockchain Chia associe les preuves d'espace à des \emph{preuves de temps} (proofs of time) basées sur des \emph{Verifiable Delay Functions} afin de vérifier qu'un certain temps s'est réellement écoulé. Ces fonctions particulières prennent un temps réel à s'exécuter et ne peuvent pas être parallélisées. Par contre la vérification de la preuve de temps est elle réalisable rapidement. Techniquement, la blockchain utilise des exponentiations répétées sur des groupes d'ordre inconnus \cite{DBLP:conf/crypto/BonehBBF18} \cite{DBLP:conf/innovations/Pietrzak19a} \cite{DBLP:conf/eurocrypt/Wesolowski19}. Ces deux systèmes de preuves sont utilisés de manière à éviter les grinding attacks en séparant la blockchain en deux chaînes parallèles. Une chaîne appelée << trunk >> dite \emph{ungrindable} contenant uniquement les preuves d'espace et de temps et une chaîne appelée << foliage >> contenant les données des transactions.
 
 Pour palier aux \emph{double dipping attacks}, Chia réalise en fait un compromis autorisant les farmers à farmer les $\kappa = 3$ premiers blocs de chaque profondeur.
 
@@ -142,7 +142,7 @@ Voyant la complexité de leur algorithme de consensus \cite{chia:consensus}, ce 
 
 \section{Implémentation}
 
-Cette section présente l'implémentation du proof of space basé sur l'inversion de fonctions de hachage. L'implémentation est faite en \textbf{Rust} et est basée sur la construction de la blockchain Chia \cite{chia:construction}. A noter que dans la majorité de la construction, on travail en bits et non en octets. Chaque troncage ce fait au niveau des bits.
+Cette section présente l'implémentation du proof of space basé sur l'inversion de fonctions de hachage. L'implémentation est faite en \textbf{Rust} et est basée sur la construction de la blockchain Chia \cite{chia:construction}. A noter que dans la majorité de la construction, on travaille en bits et non en octets. Chaque troncage ce fait au niveau des bits.
 
 \subsection{Génération des tables}
 
@@ -156,7 +156,7 @@ La phase 1 consiste à générer les tables de la 1 à la 7. On commence donc pa
 
 \inputsourcecode{rust}{"sources/f1.txt"}{Calcule de la fonction $f_1$}
 
-Pour simplifier la compréhension de cette fonction: les entrées sont 0, 1, 2, \dots, $2^k-1$. La sortie pour 0 sera les $k$ premiers bits du keystream. La sortie de 1 ce sera les $k$ bits suivant et ainsi de suite jusqu'à $2^k-1$. On peut remarqué qu'il y a une extension rajoutée à la fin (ligne 28-29). On rajoute ici 6 bits au keystream ce qui fait que $f_1(x)$ prend $k$ bits en entrée et sort $k+6$ bits en sortie. Ces 6 bits sont les bits de poids forts de $x$, ceci dans le but de minimiser les collisions (paradoxe des anniversaires). Le nonce lui est défini à 0. Il n'a pas d'importance puisqu'on utilise la \emph{plot seed} comme graine pour le PRNG. Cette plot seed est unique pour chaque farmer.
+Pour simplifier la compréhension de cette fonction: les entrées sont 0, 1, 2, \dots, $2^k-1$. La sortie pour 0 sera les $k$ premiers bits du keystream. La sortie de 1 ce sera les $k$ bits suivant et ainsi de suite jusqu'à $2^k-1$. On peut remarquer qu'il y a une extension rajoutée à la fin (ligne 28-29). On rajoute ici 6 bits au keystream ce qui fait que $f_1(x)$ prend $k$ bits en entrée et sort $k+6$ bits en sortie. Ces 6 bits sont les bits de poids forts de $x$, ceci dans le but de minimiser les collisions (paradoxe des anniversaires). Le nonce lui est défini à 0. Il n'a pas d'importance puisqu'on utilise la \emph{plot seed} comme graine pour le PRNG. Cette plot seed est unique pour chaque farmer.
 
 On stocke ensuite les entrées, les \emph{x-values} ($0,1,2,\dots,2^k-1$) accompagnées de leur valeur de sortie respective de $f_1$ sur le disque. On les trie par les valeurs de sortie pour optimiser la recherche de matchs lors du calcul de la table suivante. La table 1 est maintenant terminée et on peut passer à la table 2.
 
@@ -171,13 +171,13 @@ Ensuite, pour chaque couple $(y_1=f_1(x_1), y_2=f_1(x_2))$ tel que $\textsf{M}(y
   f_2(x_1,x_2) = \underset{k + 6}{\textsf{trunk}}(\textsf{BLAKE3}(x_1\|x_2))
 \end{equation*}
 
-On stocke ensuite les sorties de $f_2$ en gardant en mémoire l'emplacement des x-values dans la table 1. Pour ce faire, et comme il y a 2 valeurs à mémoriser, on va utiliser des index dans la table 1 sous forme de << position >> et d'<< offset >>. La position est un nombre entier indiquant où se signature la première valeur ($x_1$) dans la table 1 et l'offset est aussi un nombre entier qui lui indique où la deuxième valeur ($x_2$) se situe par rapport à la première. Techniquement cela permet d'optimiser le stockage car comme les entrées sont triées par $f_1(x_i)$ et que $f_1(x_1) + 1 = f_1(x_2)$, l'offset se sera jamais très grande et peut être stocké sur moins de bits. 
+On stocke ensuite les sorties de $f_2$ en gardant en mémoire l'emplacement des x-values dans la table 1. Pour ce faire, et comme il y a 2 valeurs à mémoriser, on va utiliser des index dans la table 1 sous forme de << position >> et d'<< offset >>. La position est un nombre entier indiquant où se signature la première valeur ($x_1$) dans la table 1 et l'offset est aussi un nombre entier qui lui indique où la deuxième valeur ($x_2$) se situe par rapport à la première. Techniquement cela permet d'optimiser le stockage car comme les entrées sont triées par $f_1(x_i)$ et que $f_1(x_1) + 1 = f_1(x_2)$, l'offset ne sera jamais très grand et peut être stocké sur moins de bits. 
 
 Voici ci-dessous le code permettant de trouver les matchs à stocker dans la table 2 :
 
 \inputsourcecode{rust}{"sources/core.txt"}{Calcul des matchs pour la table 2}
 
-Dans le code ci-dessus, on utilise un version optimisée de la fonction de matching présentée précédemment. Dans un premier temps, on place les entrées de la table 1 dans un bucket gauche ou droite en fonction de leur bucket\_id (\verb|y_bucket| dans le code ci-dessus). On peut le faire avec une seule boucle car les entrées sont triée par \verb|entry.fx|. Une fois les buckets de gauche et de droite rempli, on regarde s'il y a des matchs entre les deux buckets. La fonction \verb|fx.find_matches| n'a besoin que de vérifier la deuxième condition. La première étant déjà vérifiée en plaçant correctement les entrées à droite ou à gauche.
+Dans le code ci-dessus, on utilise une version optimisée de la fonction de matching présentée précédemment. Dans un premier temps, on place les entrées de la table 1 dans un bucket gauche ou droite en fonction de leur bucket\_id (\verb|y_bucket| dans le code ci-dessus). On peut le faire avec une seule boucle car les entrées sont triées par \verb|entry.fx|. Une fois les buckets de gauche et de droite remplis, on regarde s'il y a des matchs entre les deux buckets. La fonction \verb|fx.find_matches| n'a besoin que de vérifier la deuxième condition. La première étant déjà vérifiée en plaçant correctement les entrées à droite ou à gauche.
 
 Maintenant, pour chaque match trouvé il faut calculer $f_2(x_1,x_2)$ :
 
@@ -185,17 +185,15 @@ Maintenant, pour chaque match trouvé il faut calculer $f_2(x_1,x_2)$ :
 
 On peut remarquer que la fonction \verb|calculate_fn| prend en fait 3 entrées: $f_1(x_1)$ (\verb|left_entry.fx|), $x_1$ (\verb|left_entry.metadata|) et $x_2$ (\verb|right_entry.metadata|). En plus de hacher $x_1$ et $x_2$, elle va aussi hacher $f_1(x_1)$. Cela permet de s'assurer que les tables se font bien l'une après l'autre et qu'on ne saute pas de table. Ainsi on ne peut pas commencer par la table 7 et essayer de trouver des matchs, les preuves résultantes seraient refusées par le réseau qui applique le bon algorithme.
 
-La fonction $f_2$, en plus de retourner le hash, va également retourner une version concaténée des entrées ($x_1\|x_2$) que l'on va stocker avec la sortie, la position et l'offset. Cela sera utile pour pouvoir calculer les tables suivantes. Cette concaténation également effectuée par la fonction \verb|calculate_fn| n'est simplement une concaténation car cela donnerait des données en sortie trop grande au moment de le faire sur les dernières table et limiter le nombre de bits en sortie de la concaténation permet d'obliger un attaquant souhaitant faire une attaque de Hellman à stocker des bits supplémentaires ou faire plus de recherche sur le disque \cite{chia:construction}. C'est pourquoi la \emph{collation} est tronquée à $x \times k$ bits avec $x$ qui change en fonction de la table qu'on est en train de calculer. La valeur de $x$ permet d'assurer que le compromis temps-mémoire est plus coûteux qu'en calculant de manière honnête \cite{chia:construction}. Cette \emph{collation} est stockée dans les metadatas de l'entrée pour permettre un calcul facile pour les tables suivante car ces metadatas seront utilisées comme entrée dans \verb|calculate_fn| lors du calcul de la prochaine table.
+La fonction $f_2$, en plus de retourner le hash, va également retourner une version concaténée des entrées ($x_1\|x_2$) que l'on va stocker avec la sortie, la position et l'offset. Cette concaténation, que l'on va appeler \emph{collation}, n'est pas simplement une concaténation car cela donnerait des données en sortie trop grande au moment de le faire sur les dernières tables. C'est pourquoi on va limiter le nombre de bits en sortie de la concaténation ce qui oblige un attaquant souhaitant faire une attaque de Hellman à stocker des bits supplémentaires ou faire plus de recherche sur le disque \cite{chia:construction}. La \emph{collation} est tronquée à $x \times k$ bits avec $x$ qui change en fonction de la table qu'on est en train de calculer. La valeur de $x$ permet d'assurer que le compromis temps-mémoire est plus coûteux qu'en calculant de manière honnête \cite{chia:construction}. Cette \emph{collation} est stockée dans les metadatas de l'entrée pour permettre un calcul facile pour les tables suivantes car ces metadatas seront utilisées comme entrées dans \verb|calculate_fn| lors du calcul de la prochaine table.
 
 Voici ci-dessous le code de la fonction \verb|calculate_fn| :
 
 \inputsourcecode{rust}{"sources/fn.txt"}{calculate\_fn}
 
-Après avoir haché les 3 valeurs ensemble, on calcul la valeur de concatenation (\emph{collation}). De la table 2 à 3, c'est simplement une concatenation: $x_1\|x_2$ et $x_1\|x_2\|x_3\|x_4$. Mais ensuite, de la table 4 à 7, la valeur de la collation vaut aussi le hash que qui vient d'être calculé mais est lui tronqué à $x \times k$ bits au lieu de $k + 6$ bits.
+Après avoir haché les 3 valeurs ensemble, on calcul la valeur de concaténation (\emph{collation}). De la table 2 à 3, c'est simplement une concaténation: $x_1\|x_2$ et $x_1\|x_2\|x_3\|x_4$. Mais ensuite, de la table 4 à 7, la valeur de la collation vaut aussi le hash qui vient d'être calculé mais est lui tronqué à $x \times k$ bits au lieu de $k + 6$ bits.
 
-Il faut encore trier les entrées de la table 2 par $f_2$ et la génération de la seconde table est terminée.
-
-% TODO parler du tri on disk
+Il faut encore trier les entrées de la table 2 par $f_2$ et la génération de la seconde table est terminée. Avec de petites valeurs pour $k$, c'est facile. Il suffit de faire un tri en mémoire classique. Mais quand il s'agit de plus grandes valeurs ($k > 26$ par exemple), c'est plus compliqué car on ne peut pas tout stocker en mémoire pour effectuer le tri. Il faut donc faire un \emph{tri externe}. Pour cela, un algorithme a été réalisé sans librairie particulière. Il trie d'abord les données par petits blocs chargeables en mémoire puis effectue un \emph{k-way merge} entre tous les blocs triés. Le \emph{k-way merge} est aussi un algorithme développé pour l'occasion. Il charge en mémoire une partie de chaque bloc et prend le minimum entre toutes les parties puis l'écrit dans un nouveau fichier \cite{wiki:externalsort}.
 
 Il reste plus que 5 tables, mais heureusement le calcul est identique à la table 2. Il suffit de lire la table 2, trouver les matchs, calculer $f_3$ avec la même méthode (\verb|calculate_fn|) et stocker les valeurs dans la table 3. Et ainsi de suite jusqu'à la table 7.
 
@@ -229,7 +227,7 @@ $C_3$ à $C_7$ sont justement les \emph{collations} calculées pour la table sui
 
 \subsection{Génération de preuves}
 
-On a maintenant un plot avec 7 tables. Certes il est améliorable, on peut quand même trouver des preuves pour un challenge. Il nous suffit de regarder si on a, dans la table 7, une ou plusieurs entrées qui satisfont $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(f_7)$. Si c'est le cas, on va chercher les 2 entrées dans la table 6 grâce à la position et l'offset enregistré dans l'entrée de la table 7. Comme chaque entrée pointe vers 2 entrées dans la table précédente, on obtient 64 entrées arrivé à la table 1. Ces 64 valeurs forme la preuve comme vu précédemment.
+On a maintenant un plot avec 7 tables. Certes il est améliorable, on peut quand même trouver des preuves pour un challenge. Il nous suffit de regarder si on a, dans la table 7, une ou plusieurs entrées qui satisfont $\underset{k}{\mathrm{trunk}}(\mathrm{Chall})=\underset{k}{\mathrm{trunk}}(f_7)$. Si c'est le cas, on va chercher les 2 entrées dans la table 6 grâce à la position et l'offset enregistré dans l'entrée de la table 7. Comme chaque entrée pointe vers 2 entrées dans la table précédente, on obtient 64 entrées au niveau de la table 1. Ces 64 valeurs forment la preuve comme vu précédemment.
 
 Pour l'implémentation, c'est plus simple que la génération de plot car on a juste à parcourir la  table 7. Pour les autres tables on peut lire directement l'entrée stockée sur le disque ce qui est assez rapide.
 
@@ -237,7 +235,7 @@ Dans le code ci-dessous, on sélectionne les entrées dans la table 7 qui corres
 
 \inputsourcecode{rust}{"sources/prove_1.txt"}{Sélection des entrées dans la table 7}
 
-Dès qu'on a les entrées de la table 7, on parcours les 6 autres table de la 6 à 1. Le code ci-dessous montre le processus réalisé de manière itérative car plus performant que récursif. On récupère, pour chaque entrée, les 2 entrées parentes grâce à la position et à l'offset stocké durant le plotting. On ajoute ensuite les entrées dans un tableau qui devra contenir 64 éléments à la fin de l'algorithme.
+Dès qu'on a les entrées de la table 7, on parcours les 6 autres tables de la 6 à 1. Le code ci-dessous montre le processus réalisé de manière itérative car plus performant que récursif. On récupère, pour chaque entrée, les 2 entrées parentes grâce à la position et à l'offset stocké durant le plotting. On ajoute ensuite les entrées dans un tableau qui devra contenir 64 éléments à la fin de l'algorithme.
 
 \inputsourcecode{rust}{"sources/prove_2.txt"}{Parcours des 6 tables pour récupèrer les x-values}
 
@@ -266,7 +264,7 @@ Ensuite il faut recalculer les hashs et les \emph{collations} de chaque table et
 
 \inputsourcecode{rust}{"sources/verify_2.txt"}{Calcule de $f_1$ pour les 64 x-values de la preuve}
 
-Le code ci-dessus parcours les table de la 2 à la 7 puis chaque hash 2 par 2. Si les hashs match, on calcul le hash des \emph{collations}. A la fin des 7 tables, le tableau \verb|fx_values| ne contiendra plus qu'un élément, le hash final de la table 7 qui doit être encore comparé au challenge pour finaliser la validation de la preuve. 
+Le code ci-dessus parcours les tables de la 2 à la 7 puis chaque hash 2 par 2. Si les hashs match, on calcul le hash des \emph{collations}. A la fin des 7 tables, le tableau \verb|fx_values| ne contiendra plus qu'un élément, le hash final de la table 7 qui doit être encore comparé au challenge pour finaliser la validation de la preuve. 
 
 \section{Résultats}
 
@@ -332,7 +330,7 @@ Pour pouvoir visualiser les performances de l'algorithme, des tests de benchmark
   \caption{Mesures sur disque dur (HDD)}
 \end{table}
 
-On peut voir sur ces deux tableaux que le temps moyen augmente de manière exponentielle. C'est tout à fait normal puisque le nombre d'entrées est en $\bigO(2^k)$. On peut également remarquer que l'écart entre le minimum et le maximum est plus élevé pour des $k$ pair et extrêmement élevé pour $k = 21$. Cela vient du faite qu'avec des $k$ pair, le nombre de match soit reste stable au alentour de 70-90\% de $2^k$ entre l'exécution de chaque table, soit descend drastiquement en direction de 0 pour finir vers 0 à la table 7. Pourquoi les nombres paire ? Malheureusement je n'ai pas de réponse mais le nombre de match tend à se stabiliser plus $k$ grandi et il n'y a plus beaucoup d'écart à partir de $k = 25$. On peut en conclure que $k \in \{18,21\}$ sont à proscrire et de manière générale il vaut mieux choisir un grand $k$ (>=25) pour obtenir un remplissage optimal des tables et avoir plus de change de trouver des preuves.
+On peut voir sur ces deux tableaux que le temps moyen augmente de manière exponentielle. C'est tout à fait normal puisque le nombre d'entrées est en $\bigO(2^k)$. On peut également remarquer que l'écart entre le minimum et le maximum est plus élevé pour des $k$ pair et extrêmement élevé pour $k = 21$. Cela vient du faite qu'avec des $k$ pair, le nombre de match reste: soit stable au alentour de 70-90\% de $2^k$ entre l'exécution de chaque table, soit descend drastiquement en direction de 0 pour finir vers 0 à la table 7. Pourquoi les nombres paire ? Malheureusement je n'ai pas de réponse mais le nombre de match tend à se stabiliser plus $k$ grandi et il n'y a plus beaucoup d'écart à partir de $k = 25$. On peut en conclure que $k \in \{18,21\}$ sont à proscrire et de manière générale il vaut mieux choisir un grand $k$ (>=25) pour obtenir un remplissage optimal des tables et avoir plus de chance de trouver des preuves.
 
 Voici ci-dessous un graphique représentant le temps de plotting en fonction de $k$ :
 
@@ -342,7 +340,7 @@ Voici ci-dessous un graphique représentant le temps de plotting en fonction de 
   \caption{Comparaison du plotting en fonction de $k$}
 \end{figure}
 
-On peut remarquer que plus $k$ est grand plus le temps est court avec un SSD comparé à un HDD. Cela peut s'expliquer car la quantité de données générée est exponentielle. L'écart entre HDD et SSD sera alors de plus en plus marqué et les gains de vitesse avec un SSD de plus en plus visible.
+On peut remarquer que plus $k$ est grand plus le temps est court avec un SSD comparé à un HDD. Cela peut s'expliquer car la quantité de données générée est exponentielle. L'écart entre HDD et SSD sera alors de plus en plus marqué et les gains de vitesse avec un SSD de plus en plus visibles.
 
 \subsection{Performances de la génération de preuves}
 
@@ -410,7 +408,7 @@ Voici ci-dessous un test de benchmark avec 200 échantillons par valeur de $k$ :
   \caption{Temps de vérification d'une preuve}
 \end{table}
 
-On remarque très clairement que c'est en temps constant voir même très légèrement plus lent avec des petits $k$. Cette variation est difficilement explicable mais probablement lié au matériel et pas très significative. 
+On remarque très clairement que c'est en temps constant voir même très légèrement plus lent avec des petits $k$. Cette variation est difficilement explicable mais probablement liée au matériel et n'est pas très significative. 
 
 \subsection{Comparaison du calcul des matchs}
 
@@ -422,20 +420,18 @@ On a vu qu'il y avait deux manières de trouver les matchs: une version << naïv
   \caption{Comparaison des fonctions de matching en fonction de $k$}
 \end{figure}
 
-Sans surprise, c'est la version optimisée qui est plus rapide dû à sa meilleures complexité. La version optimisée à une complexité de $\bigO(N)$ contre $\bigO(N^2)$ pour la version naïve avec $N$ la taille d'un bucket. Les deux montrent quand même un courbe exponentielle sur le graphique car la nombre de buckets $N$ croit de manière exponentielle avec $k$.
+Sans surprise, c'est la version optimisée qui est plus rapide dû à sa meilleure complexité. La version optimisée à une complexité de $\bigO(N)$ contre $\bigO(N^2)$ pour la version naïve avec $N$ la taille d'un bucket. Les deux montrent quand même un courbe exponentielle sur le graphique car la nombre $N$ de buckets croit de manière exponentielle avec $k$.
 
 \subsection{Tests unitaires et d'intégration}
 
-L'ensemble de la construction est testée avec des tests unitaires mais également avec des tests d'intégration. Les tests unitaires en Rust se situent la majeur partie du temps au bas du fichier source contenant la fonction alors que les tests d'intégration se trouve dans un dossier << tests >> séparé. 
+L'ensemble de la construction est testée avec des tests unitaires mais également avec des tests d'intégration. Les tests unitaires en Rust se situent la majeur partie du temps au bas du fichier source contenant la fonction alors que les tests d'intégration se trouvent dans un dossier << tests >> séparé. 
 
 De plus, le service d'intégration continue de GitHub est utilisé pour exécuter les tests à chaque push afin de s'assurer du bon fonctionnement durant le développement. 
 
-\subsection{Comparaison avec Chia}
-
 \section{Améliorations possibles}
 
-La construction actuelle fonctionne bien et nous permet de trouver des preuves pour un challenge à partir d'un plot. Cependant, une seule phase pour générer le plot ne suffit pas à obtenir un plot optimisé pour le stockage. Dans la construction de Chia, il y a encore 3 phases supplémentaires réalisée après. Elles permettent de supprimer les données inutiles comme les sorties des fonctions (hashs et collations) pour ne garder que la position et l'offset. Ce qui implique de modifier toutes les positions pour prendre en compte les entrées supprimées. Les phases suivantes permettent aussi de compresser les données en optimisant le stockage de la position et de l'offset.
+La construction actuelle fonctionne bien et nous permet de trouver des preuves pour un challenge à partir d'un plot. Cependant, une seule phase pour générer le plot ne suffit pas à obtenir un plot optimisé pour le stockage. Dans la construction de Chia, il y a encore 3 phases supplémentaires réalisées après. Elles permettent de supprimer les données inutiles comme les sorties des fonctions (hashs et collations) pour ne garder que la position et l'offset. Ce qui implique de modifier toutes les positions pour prendre en compte les entrées supprimées. Les phases suivantes permettent aussi de compresser les données en optimisant le stockage de la position et de l'offset.
 
-Pour des raison des temps, elles n'ont pas pu être implémentées durant ce travail.
+Pour des raison de temps, elles n'ont pas pu être implémentées durant ce travail.
 
-Le calcul de la qualité de la preuve est également quelque chose qui reste à faire. Elle permet de sélectionner la preuve qui aura le plus de chance d'être choisir par le réseau si on trouve plusieurs preuve pour un challenge.
+Le calcul de la qualité de la preuve est également quelque chose qui reste à faire. Elle permet de sélectionner la preuve qui aura le plus de chance d'être choisie par le réseau si on trouve plusieurs preuves pour un challenge.
