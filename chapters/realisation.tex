@@ -91,4 +91,74 @@ La sérialisation et le stockage de la blockchain se font bloc par bloc à l'aid
 
 Comme pour le proof of space, l'entièreté du projet est testé avec des tests unitaires afin de vérifier le bon fonctionnent du registre, blocs, transactions et autres. Notamment pour tester les cas limites dans certaines situations ou bien des erreurs particulières.
 
-L'ensemble du projet gère les erreurs de manière ciblée avec les librairies \emph{thiserror} et \emph{anyhow} permettant de créer des erreurs personnalisées et de les gérer de manière intuitive. C'est-à-dire que la majeur partie des fonctions retournent un \verb|Result|, ce result sera traité dans la fonction << main >> et grâce à anyhow, des contextes peuvent être ajoutés pour donner plus d'indications sur une erreur.
+L'ensemble du projet gère les erreurs de manière ciblée avec les librairies \emph{thiserror} et \emph{anyhow} permettant de créer des erreurs personnalisées et de les gérer de manière intuitive. C'est-à-dire que la majeur partie des fonctions retournent un \verb|Result|, ce résultat sera traité dans la fonction << main >> et grâce à anyhow, des contextes peuvent être ajoutés pour donner plus d'indications sur une erreur.
+
+Afin de pouvoir tester la blockchain avec le protocole de proof of space, une interface en ligne de commande a été réalisée. Il est possible de l'essayer avec Cargo, l'utilitaire pour manager les projets Rust. Il faut tout d'abord récupérer le code source disponible sur GitHub: \url{https://github.com/spaceframeos/spaceframe}. Ensuite on peut lancer la commande suivante :
+
+\begin{shellcmd}
+  cargo run --release --bin spaceframe-node -- init -k 17
+\end{shellcmd}
+
+Cela va initialiser le plot pour pouvoir trouver des preuves par la suite. La valeur de $k$ est au choix mais 17 est une bonne valeur pour tester rapidement. On peut ensuite lancer la commande de démonstration pour jouer avec la blockchain :
+
+\begin{shellcmd}
+  cargo run --release --bin spaceframe-node -- demo -k 17
+\end{shellcmd}
+
+On tombe alors sur une liste d'actions. On peut ajouter une paire de clés (un compte), on peut ajouter un nouveau en bloc, on peut voir les soldes des comptes et voir les blocs présents dans la chaîne.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/chain_home.png}
+  \caption{Liste des actions}
+\end{figure}
+
+\newpage
+
+On peut choisir d'ajouter un nouveau bloc en créant d'abord 0, 1 ou plusieurs transactions (c'est possible de créer un bloc sans transaction). Il faut sélectionner la personne qui envoie, celle qui reçoit et le montant.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/chain_add_transaction.png}
+  \caption{Ajout d'une transaction}
+\end{figure}
+
+On peut ensuite prouver ce nouveau bloc et l'ajouter à la chaîne. Il est alors possible de consulter les changements au niveau des comptes.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/chain_balances.png}
+  \caption{Soldes des comptes}
+\end{figure}
+
+Le montant a bien été transféré. Maintenant on peut tester d'envoyer 100 avec le 1er compte qui n'a que 90.
+
+\newpage
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/chain_balance_error.png}
+  \caption{Erreur de création d'un bloc}
+\end{figure}
+
+Au moment de la vérification du bloc, ce dernier est refusé car il contient des transactions dont le signataire n'a pas assez d'argent.
+
+Après cela, il est possible de visualiser les blocs de la chaîne et de les vérifier par la même occasion.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/chain_blocks.png}
+  \caption{Visualisation et validation des blocs}
+\end{figure}
+
+\newpage
+
+On peut également ajouter de nouveaux comptes pour tester grâce à l'action << Add keypair >>.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{images/chain_add_keypair.png}
+  \caption{Ajout d'un compte de test supplémentaire}
+\end{figure}
+
+Ceux-ci auront alors un solde de 0 initialement.

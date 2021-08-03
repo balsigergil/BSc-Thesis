@@ -235,9 +235,11 @@ Dans le code ci-dessous, on sélectionne les entrées dans la table 7 qui corres
 
 \inputsourcecode{rust}{"sources/prove_1.txt"}{Sélection des entrées dans la table 7}
 
-Dès qu'on a les entrées de la table 7, on parcours les 6 autres tables de la 6 à 1. Le code ci-dessous montre le processus réalisé de manière itérative car plus performant que récursif. On récupère, pour chaque entrée, les 2 entrées parentes grâce à la position et à l'offset stocké durant le plotting. On ajoute ensuite les entrées dans un tableau qui devra contenir 64 éléments à la fin de l'algorithme.
+Dès qu'on a les entrées de la table 7, on parcours les 6 autres tables de la 6 à 1. Le code ci-dessous montre le processus réalisé de manière itérative car plus performant que récursif. On récupère, pour chaque entrée, les 2 entrées parentes grâce à la position et à l'offset stocké durant le plotting. On ajoute ensuite les entrées dans un tableau qui devra contenir 64 éléments à la fin de l'algorithme. On exécute le code ci-dessous une fois par table de la 6 à la 1.
 
-\inputsourcecode{rust}{"sources/prove_2.txt"}{Parcours des 6 tables pour récupèrer les x-values}
+\inputsourcecode{rust}{"sources/prove_2.txt"}{Récupération des entrées par table}
+
+\newpage
 
 Ainsi, il est possible de réunir toutes ces informations en une structure afin de pouvoir être vérifiée facilement :
 
@@ -266,12 +268,14 @@ Ensuite il faut recalculer les hashs et les \emph{collations} de chaque table et
 
 Le code ci-dessus parcours les tables de la 2 à la 7 puis chaque hash 2 par 2. Si les hashs match, on calcul le hash des \emph{collations}. A la fin des 7 tables, le tableau \verb|fx_values| ne contiendra plus qu'un élément, le hash final de la table 7 qui doit être encore comparé au challenge pour finaliser la validation de la preuve. 
 
+\newpage
 \section{Résultats}
 
 Pour conclure ce chapitre sur le \emph{proof of space}, voici une présentation des résultats obtenus concernant les performances de l'implémentation.
 
 L'implémentation en Rust de la phase 1 du plotting est complète et fidèle à la construction \cite{chia:construction} de Chia. Il reste cependant des améliorations possibles pour optimiser le stockage et les performances. Elles sont décrites dans la section suivante. Mais l'implémentation réalisée permet d'avoir un algorithme de \emph{proof of space} fonctionnelle qui peut générer des preuves pour un challenge et peut donc être utilisé au sein d'une blockchain.
 
+\newpage
 \subsection{Performances du plotting}
 
 Pour pouvoir visualiser les performances de l'algorithme, des tests de benchmark ont été réalisés avec l'outil \href{https://github.com/sharkdp/hyperfine}{Hyperfine}. On peut se demander en effet si le fait d'avoir un SSD améliore la vitesse du plotting, ce qui serait logique puisque la lecture et l'écriture est plus rapide. Plusieurs mesures ont été faite pour des $k$ différent. Pour chaque $k$, 10 mesures avec des plot seeds différentes sont prises permettant de faire une moyenne de temps :
@@ -410,6 +414,7 @@ Voici ci-dessous un test de benchmark avec 200 échantillons par valeur de $k$ :
 
 On remarque très clairement que c'est en temps constant voir même très légèrement plus lent avec des petits $k$. Cette variation est difficilement explicable mais probablement liée au matériel et n'est pas très significative. 
 
+\newpage
 \subsection{Comparaison du calcul des matchs}
 
 On a vu qu'il y avait deux manières de trouver les matchs: une version << naïve >> et une optimisée. Voici ci-dessous un graphique montrant le temps qu'il faut pour trouver tous les matchs d'une table de $2^k$ éléments :
